@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Volleyball Stat Tracker</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* Prevent accidental zoom on double tap on mobile devices */
+    touch-action: manipulation;
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none">
+
+  <!-- TOP HEADER -->
+  <header class="bg-slate-800 border-b border-slate-700 p-4 flex justify-between items-center shadow-lg">
+    <div>
+      <h1 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-volleyball mr-2"></i>Stat Tracker</h1>
+      <p id="matchInfoText" class="text-xs text-slate-400">vs Opponent | Set 1</p>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="openSetupModal()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-semibold">
+        <i class="fa-solid fa-gear mr-1"></i> Match Setup
+      </button>
+      <button onclick="exportCSV()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-xs font-semibold">
+        <i class="fa-solid fa-download mr-1"></i> Export Stats
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN COURT VIEW -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col gap-4">
+    
+    <!-- CONTROLS BAR -->
+    <div class="grid grid-cols-2 gap-3">
+      <button onclick="rotateCourt()" class="py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shadow-md flex justify-center items-center gap-2 text-base active:scale-95 transition">
+        <i class="fa-solid fa-rotate-right text-lg"></i> Rotate Clockwise
+      </button>
+      <button onclick="swapLibero()" class="py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg shadow-md flex justify-center items-center gap-2 text-base active:scale-95 transition">
+        <i class="fa-solid fa-arrows-rotate text-lg"></i> Swap Libero / MB
+      </button>
+    </div>
+
+    <!-- VOLLEYBALL COURT GUI -->
+    <div class="relative w-full aspect-[4/3] max-h-[480px] bg-amber-700 border-4 border-white rounded-xl shadow-2xl p-3 flex flex-col justify-between overflow-hidden">
+      <!-- NET INDICATOR -->
+      <div class="w-full h-3 bg-slate-200 border-y-2 border-slate-400 flex items-center justify-center mb-2">
+        <span class="text-[10px] text-slate-700 font-black tracking-widest uppercase">NET</span>
+      </div>
+
+      <!-- ATTACK LINE (3-Meter Line) -->
+      <div class="absolute top-1/3 left-0 right-0 border-b-2 border-dashed border-white/60 pointer-events-none"></div>
+
+      <!-- COURT GRID POSITIONS -->
+      <div class="flex-1 grid grid-cols-3 grid-rows-2 gap-3 relative z-10">
+        <!-- FRONT ROW -->
+        <div onclick="tapPosition(4)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
+          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 4 (Front Left)</span>
+          <div id="circle-4" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        </div>
+        <div onclick="tapPosition(3)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
+          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 3 (Front Mid)</span>
+          <div id="circle-3" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        </div>
+        <div onclick="tapPosition(2)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
+          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 2 (Front Right)</span>
+          <div id="circle-2" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        </div>
+
+        <!-- BACK ROW -->
+        <div onclick="tapPosition(5)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
+          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 5 (Back Left)</span>
+          <div id="circle-5" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        </div>
+        <div onclick="tapPosition(6)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
+          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 6 (Back Mid)</span>
+          <div id="circle-6" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        </div>
+        <div onclick="tapPosition(1)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
+          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 1 (Back Right)</span>
+          <div id="circle-1" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE STATS SUMMARY TABLE -->
+    <div class="bg-slate-800 rounded-xl p-4 shadow-md border border-slate-700">
+      <h3 class="text-sm font-bold text-slate-300 mb-2 flex justify-between items-center">
+        <span><i class="fa-solid fa-chart-simple mr-2"></i>Live Box Score</span>
+        <span class="text-xs font-normal text-slate-400">Tap court spot above to log stat</span>
+      </h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-700/50 uppercase text-slate-400">
+            <tr>
+              <th class="p-2">Player</th>
+              <th class="p-2 text-center">SR Avg (0-3)</th>
+              <th class="p-2 text-center">Serv Avg (0-4)</th>
+              <th class="p-2 text-center">Kills</th>
+              <th class="p-2 text-center">Digs</th>
+            </tr>
+          </thead>
+          <tbody id="boxScoreBody" class="divide-y divide-slate-700">
+            <!-- Populated via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- STAT LOG POPUP MODAL -->
+  <div id="statModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-md p-5 flex flex-col gap-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <div>
+          <h2 id="modalPlayerTitle" class="text-lg font-bold text-amber-400">Player # --</h2>
+          <p id="modalPosTitle" class="text-xs text-slate-400">Position --</p>
+        </div>
+        <button onclick="closeStatModal()" class="text-slate-400 hover:text-white text-xl p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- SERVE RECEIVE (0-3) -->
+      <div>
+        <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Serve Receive (0-3 Scale)</label>
+        <div class="grid grid-cols-4 gap-2">
+          <button onclick="recordStat('sr', 0)" class="py-2.5 bg-red-900/60 hover:bg-red-600 text-red-200 rounded font-bold border border-red-500/40">0 (Ace Allowed)</button>
+          <button onclick="recordStat('sr', 1)" class="py-2.5 bg-orange-900/60 hover:bg-orange-600 text-orange-200 rounded font-bold border border-orange-500/40">1 (Off Net)</button>
+          <button onclick="recordStat('sr', 2)" class="py-2.5 bg-amber-900/60 hover:bg-amber-600 text-amber-200 rounded font-bold border border-amber-500/40">2 (Good)</button>
+          <button onclick="recordStat('sr', 3)" class="py-2.5 bg-emerald-900/60 hover:bg-emerald-600 text-emerald-200 rounded font-bold border border-emerald-500/40">3 (Perfect)</button>
+        </div>
+      </div>
+
+      <!-- SERVING (0-4) -->
+      <div>
+        <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Serving Rating (0-4 Scale)</label>
+        <div class="grid grid-cols-5 gap-1.5">
+          <button onclick="recordStat('serve', 0)" class="py-2 bg-red-900/60 hover:bg-red-600 text-red-200 text-xs font-bold rounded border border-red-500/40">0 (Err)</button>
+          <button onclick="recordStat('serve', 1)" class="py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded">1 (Easy)</button>
+          <button onclick="recordStat('serve', 2)" class="py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded">2 (Med)</button>
+          <button onclick="recordStat('serve', 3)" class="py-2 bg-amber-900/60 hover:bg-amber-600 text-amber-200 text-xs font-bold rounded border border-amber-500/40">3 (OOS)</button>
+          <button onclick="recordStat('serve', 4)" class="py-2 bg-emerald-900/60 hover:bg-emerald-600 text-emerald-200 text-xs font-bold rounded border border-emerald-500/40">4 (Ace)</button>
+        </div>
+      </div>
+
+      <!-- ATTACKING & DEFENSE -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Attacking</label>
+          <div class="flex flex-col gap-1.5">
+            <button onclick="recordStat('kill', 1)" class="py-2 bg-emerald-600 hover:bg-emerald-500 font-bold text-xs rounded">Kill (+1)</button>
+            <button onclick="recordStat('attack_err', 1)" class="py-2 bg-red-600 hover:bg-red-500 font-bold text-xs rounded">Attack Error (-1)</button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Defense</label>
+          <div class="flex flex-col gap-1.5">
+            <button onclick="recordStat('dig', 1)" class="py-2 bg-blue-600 hover:bg-blue-500 font-bold text-xs rounded">Dig (+1)</button>
+            <button onclick="recordStat('block', 1)" class="py-2 bg-purple-600 hover:bg-purple-500 font-bold text-xs rounded">Block (+1)</button>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closeStatModal()" class="mt-2 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-xs rounded border border-slate-600">
+        <i class="fa-solid fa-arrow-left mr-1"></i> Return to Court GUI
+      </button>
+    </div>
+  </div>
+
+  <!-- MATCH SETUP MODAL -->
+  <div id="setupModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-lg p-5 flex flex-col gap-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <h2 class="text-lg font-bold text-amber-400 border-b border-slate-700 pb-2">Match & Lineup Setup</h2>
+      
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Opponent Name</label>
+        <input id="opponentInput" type="text" value="Eagles" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Set Number</label>
+          <input id="setNumInput" type="number" value="1" min="1" max="5" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Libero Jersey #</label>
+          <input id="liberoInput" type="text" value="1" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white" />
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-xs font-bold uppercase text-slate-400 mb-2">Starting Lineup (Jersey #s)</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="text-[10px] text-slate-400">Pos 1 (Back Right):</label><input id="p1-num" type="text" value="4" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
+          <div><label class="text-[10px] text-slate-400">Pos 2 (Front Right):</label><input id="p2-num" type="text" value="2" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
+          <div><label class="text-[10px] text-slate-400">Pos 3 (Front Mid - MB):</label><input id="p3-num" type="text" value="5" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
+          <div><label class="text-[10px] text-slate-400">Pos 4 (Front Left):</label><input id="p4-num" type="text" value="12" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
+          <div><label class="text-[10px] text-slate-400">Pos 5 (Back Left):</label><input id="p5-num" type="text" value="8" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
+          <div><label class="text-[10px] text-slate-400">Pos 6 (Back Mid - MB):</label><input id="p6-num" type="text" value="15" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
+        </div>
+      </div>
+
+      <button onclick="saveSetup()" class="py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded text-sm mt-2">
+        Save Lineup & Return to Game
+      </button>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC -->
+  <script>
+    // State variables
+    let opponent = "Eagles";
+    let setNumber = 1;
+    let liberoNumber = "1";
+    let currentPosSelected = null;
+
+    // Court positions state: key = position on court (1-6), value = jersey number string
+    let court = {
+      1: "4",
+      2: "2",
+      3: "5",
+      4: "12",
+      5: "8",
+      6: "15"
+    };
+
+    // Sub state to track original Middle Blockers when Libero is in
+    let originalMiddles = { 6: null, 5: null, 1: null };
+
+    // Stats Log Array
+    let statLogs = [];
+
+    // Initialize UI on page load
+    window.onload = function() {
+      updateCourtGUI();
+      updateBoxScore();
+    };
+
+    function updateCourtGUI() {
+      for (let pos = 1; pos <= 6; pos++) {
+        const circleEl = document.getElementById(`circle-${pos}`);
+        const playerNum = court[pos];
+        const isLibero = (playerNum === liberoNumber);
+
+        circleEl.className = `w-14 h-14 rounded-full border-2 flex flex-col items-center justify-center shadow-lg mt-1 ${
+          isLibero ? 'bg-indigo-600 border-white' : 'bg-slate-800 border-amber-400'
+        }`;
+        
+        circleEl.innerHTML = `
+          <span class="text-xs ${isLibero ? 'text-indigo-200' : 'text-amber-400'} font-bold">#${playerNum}</span>
+          ${isLibero ? '<span class="text-[9px] text-white font-extrabold uppercase">LIB</span>' : ''}
+        `;
+      }
+      document.getElementById('matchInfoText').innerText = `vs ${opponent} | Set ${setNumber}`;
+    }
+
+    function rotateCourt() {
+      // Clockwise Rotation: 1->6, 6->5, 5->4, 4->3, 3->2, 2->1
+      const newCourt = {
+        1: court[2],
+        2: court[3],
+        3: court[4],
+        4: court[5],
+        5: court[6],
+        6: court[1]
+      };
+      court = newCourt;
+      updateCourtGUI();
+    }
+
+    function swapLibero() {
+      // Prompt user which back-row spot to swap Libero into (Positions 1, 6, 5)
+      const targetPos = prompt("Enter Back-Row Position to swap Libero into (1, 5, or 6):", "6");
+      if (!targetPos || !["1", "5", "6"].includes(targetPos)) return;
+
+      const pos = parseInt(targetPos);
+      if (court[pos] === liberoNumber) {
+        // Swap original Middle back in
+        if (originalMiddles[pos]) {
+          court[pos] = originalMiddles[pos];
+          originalMiddles[pos] = null;
+        } else {
+          alert("Middle Blocker number not remembered. Edit in setup.");
+        }
+      } else {
+        // Save current middle, bring in Libero
+        originalMiddles[pos] = court[pos];
+        court[pos] = liberoNumber;
+      }
+      updateCourtGUI();
+    }
+
+    function tapPosition(pos) {
+      currentPosSelected = pos;
+      const playerNum = court[pos];
+      document.getElementById('modalPlayerTitle').innerText = `Player #${playerNum}`;
+      document.getElementById('modalPosTitle').innerText = `Logging event for Court Position ${pos}`;
+      document.getElementById('statModal').classList.remove('hidden');
+    }
+
+    function closeStatModal() {
+      document.getElementById('statModal').classList.add('hidden');
+      currentPosSelected = null;
+    }
+
+    function recordStat(statType, val) {
+      if (!currentPosSelected) return;
+      const playerNum = court[currentPosSelected];
+
+      statLogs.push({
+        timestamp: new Date().toISOString(),
+        opponent: opponent,
+        set: setNumber,
+        player: playerNum,
+        position: currentPosSelected,
+        type: statType,
+        value: val
+      });
+
+      closeStatModal();
+      updateBoxScore();
+    }
+
+    function updateBoxScore() {
+      // Aggregate stats per player
+      const summary = {};
+
+      statLogs.forEach(entry => {
+        const p = entry.player;
+        if (!summary[p]) {
+          summary[p] = { srTotal: 0, srCount: 0, serveTotal: 0, serveCount: 0, kills: 0, digs: 0 };
+        }
+        if (entry.type === 'sr') {
+          summary[p].srTotal += entry.value;
+          summary[p].srCount++;
+        } else if (entry.type === 'serve') {
+          summary[p].serveTotal += entry.value;
+          summary[p].serveCount++;
+        } else if (entry.type === 'kill') {
+          summary[p].kills++;
+        } else if (entry.type === 'dig') {
+          summary[p].digs++;
+        }
+      });
+
+      const tbody = document.getElementById('boxScoreBody');
+      tbody.innerHTML = '';
+
+      const players = Object.keys(summary);
+      if (players.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500">No stats recorded yet. Tap any spot on the court to begin.</td></tr>`;
+        return;
+      }
+
+      players.forEach(p => {
+        const s = summary[p];
+        const srAvg = s.srCount > 0 ? (s.srTotal / s.srCount).toFixed(2) : '-';
+        const serveAvg = s.serveCount > 0 ? (s.serveTotal / s.serveCount).toFixed(2) : '-';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-700/30";
+        tr.innerHTML = `
+          <td class="p-2 font-bold text-amber-400">#${p}</td>
+          <td class="p-2 text-center font-mono">${srAvg} <span class="text-[10px] text-slate-500">(${s.srCount})</span></td>
+          <td class="p-2 text-center font-mono">${serveAvg} <span class="text-[10px] text-slate-500">(${s.serveCount})</span></td>
+          <td class="p-2 text-center font-mono">${s.kills}</td>
+          <td class="p-2 text-center font-mono">${s.digs}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openSetupModal() {
+      document.getElementById('setupModal').classList.remove('hidden');
+    }
+
+    function saveSetup() {
+      opponent = document.getElementById('opponentInput').value || "Opponent";
+      setNumber = parseInt(document.getElementById('setNumInput').value) || 1;
+      liberoNumber = document.getElementById('liberoInput').value || "1";
+
+      court[1] = document.getElementById('p1-num').value;
+      court[2] = document.getElementById('p2-num').value;
+      court[3] = document.getElementById('p3-num').value;
+      court[4] = document.getElementById('p4-num').value;
+      court[5] = document.getElementById('p5-num').value;
+      court[6] = document.getElementById('p6-num').value;
+
+      document.getElementById('setupModal').classList.add('hidden');
+      updateCourtGUI();
+    }
+
+    function exportCSV() {
+      if (statLogs.length === 0) {
+        alert("No stat records to export yet!");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,Timestamp,Opponent,Set,Player,CourtPosition,StatType,RatingValue\n";
+      statLogs.forEach(row => {
+        csvContent += `${row.timestamp},${row.opponent},${row.set},${row.player},${row.position},${row.type},${row.value}\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `volleyball_stats_${opponent}_set${setNumber}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
