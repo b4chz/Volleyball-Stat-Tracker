@@ -61,38 +61,32 @@
       <!-- COURT GRID POSITIONS -->
       <div class="flex-1 grid grid-cols-3 grid-rows-2 gap-2 sm:gap-3 relative z-10">
         <!-- FRONT ROW -->
-        <div onclick="tapPosition(4)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
-          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 4 (Front Left)</span>
-          <div id="circle-4" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        <div onclick="tapPosition(4)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex items-center justify-center cursor-pointer border border-white/20 relative">
+          <div id="circle-4" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg"></div>
         </div>
-        <div onclick="tapPosition(3)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
-          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 3 (Front Mid)</span>
-          <div id="circle-3" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        <div onclick="tapPosition(3)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex items-center justify-center cursor-pointer border border-white/20 relative">
+          <div id="circle-3" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg"></div>
         </div>
-        <div onclick="tapPosition(2)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
-          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 2 (Front Right)</span>
-          <div id="circle-2" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        <div onclick="tapPosition(2)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex items-center justify-center cursor-pointer border border-white/20 relative">
+          <div id="circle-2" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg"></div>
         </div>
 
         <!-- BACK ROW (With Libero Quick Swap Buttons) -->
-        <div onclick="tapPosition(5)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
-          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 5 (Back Left)</span>
-          <div id="circle-5" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
-          <button onclick="toggleLiberoSpot(event, 5)" class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-[10px] font-black text-white rounded border border-white/40 shadow">
+        <div onclick="tapPosition(5)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex items-center justify-center cursor-pointer border border-white/20 relative">
+          <div id="circle-5" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg"></div>
+          <button onclick="toggleLiberoSpot(event, 5)" class="absolute bottom-1 right-1 px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-[10px] font-black text-white rounded border border-white/40 shadow">
             L
           </button>
         </div>
-        <div onclick="tapPosition(6)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
-          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 6 (Back Mid)</span>
-          <div id="circle-6" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
-          <button onclick="toggleLiberoSpot(event, 6)" class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-[10px] font-black text-white rounded border border-white/40 shadow">
+        <div onclick="tapPosition(6)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex items-center justify-center cursor-pointer border border-white/20 relative">
+          <div id="circle-6" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg"></div>
+          <button onclick="toggleLiberoSpot(event, 6)" class="absolute bottom-1 right-1 px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-[10px] font-black text-white rounded border border-white/40 shadow">
             L
           </button>
         </div>
-        <div onclick="tapPosition(1)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
-          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 1 (Back Right)</span>
-          <div id="circle-1" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
-          <button onclick="toggleLiberoSpot(event, 1)" class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-[10px] font-black text-white rounded border border-white/40 shadow">
+        <div onclick="tapPosition(1)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex items-center justify-center cursor-pointer border border-white/20 relative">
+          <div id="circle-1" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg"></div>
+          <button onclick="toggleLiberoSpot(event, 1)" class="absolute bottom-1 right-1 px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-[10px] font-black text-white rounded border border-white/40 shadow">
             L
           </button>
         </div>
@@ -130,7 +124,6 @@
       <div class="flex justify-between items-center border-b border-slate-700 pb-2">
         <div>
           <h2 id="modalPlayerTitle" class="text-lg font-bold text-amber-400">Player # --</h2>
-          <p id="modalPosTitle" class="text-xs text-slate-400">Position --</p>
         </div>
         <button onclick="closeStatModal()" class="text-slate-400 hover:text-white text-xl p-1">
           <i class="fa-solid fa-xmark"></i>
@@ -286,12 +279,12 @@
         const playerNum = court[pos];
         const isLibero = (playerNum === liberoNumber);
 
-        circleEl.className = `w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 flex flex-col items-center justify-center shadow-lg mt-1 ${
+        circleEl.className = `w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 flex flex-col items-center justify-center shadow-lg ${
           isLibero ? 'bg-indigo-600 border-white' : 'bg-slate-800 border-amber-400'
         }`;
         
         circleEl.innerHTML = `
-          <span class="text-xs ${isLibero ? 'text-indigo-200' : 'text-amber-400'} font-bold">#${playerNum}</span>
+          <span class="text-sm sm:text-base ${isLibero ? 'text-indigo-200' : 'text-amber-400'} font-black">#${playerNum}</span>
           ${isLibero ? '<span class="text-[9px] text-white font-extrabold uppercase">LIB</span>' : ''}
         `;
       }
@@ -313,13 +306,13 @@
     }
 
     function toggleLiberoSpot(event, pos) {
-      event.stopPropagation(); // Prevents opening stat modal when tapping 'L' button
+      event.stopPropagation();
       if (court[pos] === liberoNumber) {
         if (originalPlayersBeforeLibero[pos]) {
           court[pos] = originalPlayersBeforeLibero[pos];
           originalPlayersBeforeLibero[pos] = null;
         } else {
-          court[pos] = "5"; // Default fallback
+          court[pos] = "5";
         }
       } else {
         originalPlayersBeforeLibero[pos] = court[pos];
@@ -333,7 +326,6 @@
       currentPosSelected = pos;
       const playerNum = court[pos];
       document.getElementById('modalPlayerTitle').innerText = `Player #${playerNum}`;
-      document.getElementById('modalPosTitle').innerText = `Logging stat for Court Position ${pos}`;
       document.getElementById('subPlayerInput').value = '';
       document.getElementById('statModal').classList.remove('hidden');
     }
@@ -398,7 +390,7 @@
       const tbody = document.getElementById('boxScoreBody');
       tbody.innerHTML = '';
 
-      const players = Object.keys(summary);
+      const players = Object.keys(summary).sort((a, b) => parseInt(a) - parseInt(b));
       if (players.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500">No stats recorded yet. Tap any court spot to begin.</td></tr>`;
         return;
@@ -422,7 +414,6 @@
       });
     }
 
-    // SAVED GAMES & LOCALSTORAGE LOGIC
     function saveCurrentMatchState(showAlert = false) {
       const matchData = {
         id: matchId,
