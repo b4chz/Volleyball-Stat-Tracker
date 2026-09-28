@@ -9,45 +9,49 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    /* Prevent accidental zoom on double tap on mobile devices */
     touch-action: manipulation;
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none pb-10">
 
   <!-- TOP HEADER -->
-  <header class="bg-slate-800 border-b border-slate-700 p-4 flex justify-between items-center shadow-lg">
+  <header class="bg-slate-800 border-b border-slate-700 p-3 sm:p-4 flex justify-between items-center shadow-lg">
     <div>
-      <h1 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-volleyball mr-2"></i>Stat Tracker</h1>
+      <h1 class="text-lg sm:text-xl font-bold text-amber-400 flex items-center gap-2">
+        <i class="fa-solid fa-volleyball"></i> Stat Tracker
+      </h1>
       <p id="matchInfoText" class="text-xs text-slate-400">vs Opponent | Set 1</p>
     </div>
-    <div class="flex gap-2">
-      <button onclick="openSetupModal()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-semibold">
-        <i class="fa-solid fa-gear mr-1"></i> Match Setup
+    <div class="flex gap-1.5 sm:gap-2">
+      <button onclick="openHistoryModal()" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-semibold">
+        <i class="fa-solid fa-folder-open mr-1"></i> History
       </button>
-      <button onclick="exportCSV()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-xs font-semibold">
-        <i class="fa-solid fa-download mr-1"></i> Export Stats
+      <button onclick="openSetupModal()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-semibold">
+        <i class="fa-solid fa-gear mr-1"></i> Setup
+      </button>
+      <button onclick="exportCSV()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-xs font-semibold">
+        <i class="fa-solid fa-download mr-1"></i> CSV
       </button>
     </div>
   </header>
 
   <!-- MAIN COURT VIEW -->
-  <main class="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col gap-4">
+  <main class="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-4 flex flex-col gap-4">
     
     <!-- CONTROLS BAR -->
     <div class="grid grid-cols-2 gap-3">
-      <button onclick="rotateCourt()" class="py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shadow-md flex justify-center items-center gap-2 text-base active:scale-95 transition">
+      <button onclick="rotateCourt()" class="py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shadow-md flex justify-center items-center gap-2 text-sm sm:text-base active:scale-95 transition">
         <i class="fa-solid fa-rotate-right text-lg"></i> Rotate Clockwise
       </button>
-      <button onclick="swapLibero()" class="py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg shadow-md flex justify-center items-center gap-2 text-base active:scale-95 transition">
-        <i class="fa-solid fa-arrows-rotate text-lg"></i> Swap Libero / MB
+      <button onclick="saveCurrentMatchState(true)" class="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow-md flex justify-center items-center gap-2 text-sm sm:text-base active:scale-95 transition">
+        <i class="fa-solid fa-floppy-disk text-lg"></i> Save Game Data
       </button>
     </div>
 
     <!-- VOLLEYBALL COURT GUI -->
-    <div class="relative w-full aspect-[4/3] max-h-[480px] bg-amber-700 border-4 border-white rounded-xl shadow-2xl p-3 flex flex-col justify-between overflow-hidden">
+    <div class="relative w-full aspect-[4/3] max-h-[460px] bg-amber-700 border-4 border-white rounded-xl shadow-2xl p-2 sm:p-3 flex flex-col justify-between overflow-hidden">
       <!-- NET INDICATOR -->
-      <div class="w-full h-3 bg-slate-200 border-y-2 border-slate-400 flex items-center justify-center mb-2">
+      <div class="w-full h-3 bg-slate-200 border-y-2 border-slate-400 flex items-center justify-center mb-1">
         <span class="text-[10px] text-slate-700 font-black tracking-widest uppercase">NET</span>
       </div>
 
@@ -55,42 +59,51 @@
       <div class="absolute top-1/3 left-0 right-0 border-b-2 border-dashed border-white/60 pointer-events-none"></div>
 
       <!-- COURT GRID POSITIONS -->
-      <div class="flex-1 grid grid-cols-3 grid-rows-2 gap-3 relative z-10">
+      <div class="flex-1 grid grid-cols-3 grid-rows-2 gap-2 sm:gap-3 relative z-10">
         <!-- FRONT ROW -->
-        <div onclick="tapPosition(4)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
-          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 4 (Front Left)</span>
-          <div id="circle-4" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        <div onclick="tapPosition(4)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
+          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 4 (Front Left)</span>
+          <div id="circle-4" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
         </div>
-        <div onclick="tapPosition(3)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
-          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 3 (Front Mid)</span>
-          <div id="circle-3" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        <div onclick="tapPosition(3)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
+          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 3 (Front Mid)</span>
+          <div id="circle-3" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
         </div>
-        <div onclick="tapPosition(2)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
-          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 2 (Front Right)</span>
-          <div id="circle-2" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        <div onclick="tapPosition(2)" class="pos-cell bg-amber-600/50 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
+          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 2 (Front Right)</span>
+          <div id="circle-2" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
         </div>
 
-        <!-- BACK ROW -->
-        <div onclick="tapPosition(5)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
-          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 5 (Back Left)</span>
-          <div id="circle-5" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        <!-- BACK ROW (With Libero Quick Swap Buttons) -->
+        <div onclick="tapPosition(5)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
+          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 5 (Back Left)</span>
+          <div id="circle-5" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+          <button onclick="toggleLiberoSpot(event, 5)" class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-[10px] font-black text-white rounded border border-white/40 shadow">
+            L
+          </button>
         </div>
-        <div onclick="tapPosition(6)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
-          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 6 (Back Mid)</span>
-          <div id="circle-6" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        <div onclick="tapPosition(6)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
+          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 6 (Back Mid)</span>
+          <div id="circle-6" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+          <button onclick="toggleLiberoSpot(event, 6)" class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-[10px] font-black text-white rounded border border-white/40 shadow">
+            L
+          </button>
         </div>
-        <div onclick="tapPosition(1)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20">
-          <span class="text-[10px] font-bold text-amber-200 uppercase">Pos 1 (Back Right)</span>
-          <div id="circle-1" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+        <div onclick="tapPosition(1)" class="pos-cell bg-amber-800/40 hover:bg-amber-500/60 rounded-lg flex flex-col items-center justify-center cursor-pointer border border-white/20 relative">
+          <span class="text-[9px] sm:text-[10px] font-bold text-amber-200 uppercase">Pos 1 (Back Right)</span>
+          <div id="circle-1" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg mt-1"></div>
+          <button onclick="toggleLiberoSpot(event, 1)" class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-[10px] font-black text-white rounded border border-white/40 shadow">
+            L
+          </button>
         </div>
       </div>
     </div>
 
     <!-- LIVE STATS SUMMARY TABLE -->
-    <div class="bg-slate-800 rounded-xl p-4 shadow-md border border-slate-700">
+    <div class="bg-slate-800 rounded-xl p-3 sm:p-4 shadow-md border border-slate-700">
       <h3 class="text-sm font-bold text-slate-300 mb-2 flex justify-between items-center">
         <span><i class="fa-solid fa-chart-simple mr-2"></i>Live Box Score</span>
-        <span class="text-xs font-normal text-slate-400">Tap court spot above to log stat</span>
+        <span class="text-[10px] sm:text-xs font-normal text-slate-400">Tap court spot above to log stat</span>
       </h3>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs text-slate-300">
@@ -113,8 +126,8 @@
 
   <!-- STAT LOG POPUP MODAL -->
   <div id="statModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-md p-5 flex flex-col gap-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-md p-4 sm:p-5 flex flex-col gap-3 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-2">
         <div>
           <h2 id="modalPlayerTitle" class="text-lg font-bold text-amber-400">Player # --</h2>
           <p id="modalPosTitle" class="text-xs text-slate-400">Position --</p>
@@ -124,36 +137,47 @@
         </button>
       </div>
 
+      <!-- QUICK SUB / EDIT NUMBER SECTION -->
+      <div class="bg-slate-900/80 border border-slate-700 rounded-lg p-2.5 flex items-center justify-between gap-2">
+        <label class="text-xs text-slate-300 font-semibold whitespace-nowrap"><i class="fa-solid fa-user-pen mr-1"></i> Sub / Change #:</label>
+        <div class="flex gap-2 w-full max-w-[180px]">
+          <input id="subPlayerInput" type="text" placeholder="New #" class="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1 text-xs text-center font-bold text-amber-400" />
+          <button onclick="applyPlayerSub()" class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded text-xs">
+            Sub
+          </button>
+        </div>
+      </div>
+
       <!-- SERVE RECEIVE (0-3) -->
       <div>
         <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Serve Receive (0-3 Scale)</label>
-        <div class="grid grid-cols-4 gap-2">
-          <button onclick="recordStat('sr', 0)" class="py-2.5 bg-red-900/60 hover:bg-red-600 text-red-200 rounded font-bold border border-red-500/40">0 (Ace Allowed)</button>
-          <button onclick="recordStat('sr', 1)" class="py-2.5 bg-orange-900/60 hover:bg-orange-600 text-orange-200 rounded font-bold border border-orange-500/40">1 (Off Net)</button>
-          <button onclick="recordStat('sr', 2)" class="py-2.5 bg-amber-900/60 hover:bg-amber-600 text-amber-200 rounded font-bold border border-amber-500/40">2 (Good)</button>
-          <button onclick="recordStat('sr', 3)" class="py-2.5 bg-emerald-900/60 hover:bg-emerald-600 text-emerald-200 rounded font-bold border border-emerald-500/40">3 (Perfect)</button>
+        <div class="grid grid-cols-4 gap-1.5">
+          <button onclick="recordStat('sr', 0)" class="py-2.5 bg-red-900/60 hover:bg-red-600 text-red-200 rounded text-xs font-bold border border-red-500/40">0 (Ace)</button>
+          <button onclick="recordStat('sr', 1)" class="py-2.5 bg-orange-900/60 hover:bg-orange-600 text-orange-200 rounded text-xs font-bold border border-orange-500/40">1 (OOS)</button>
+          <button onclick="recordStat('sr', 2)" class="py-2.5 bg-amber-900/60 hover:bg-amber-600 text-amber-200 rounded text-xs font-bold border border-amber-500/40">2 (Good)</button>
+          <button onclick="recordStat('sr', 3)" class="py-2.5 bg-emerald-900/60 hover:bg-emerald-600 text-emerald-200 rounded text-xs font-bold border border-emerald-500/40">3 (Perfect)</button>
         </div>
       </div>
 
       <!-- SERVING (0-4) -->
       <div>
         <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Serving Rating (0-4 Scale)</label>
-        <div class="grid grid-cols-5 gap-1.5">
+        <div class="grid grid-cols-5 gap-1">
           <button onclick="recordStat('serve', 0)" class="py-2 bg-red-900/60 hover:bg-red-600 text-red-200 text-xs font-bold rounded border border-red-500/40">0 (Err)</button>
-          <button onclick="recordStat('serve', 1)" class="py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded">1 (Easy)</button>
-          <button onclick="recordStat('serve', 2)" class="py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded">2 (Med)</button>
-          <button onclick="recordStat('serve', 3)" class="py-2 bg-amber-900/60 hover:bg-amber-600 text-amber-200 text-xs font-bold rounded border border-amber-500/40">3 (OOS)</button>
+          <button onclick="recordStat('serve', 1)" class="py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded">1</button>
+          <button onclick="recordStat('serve', 2)" class="py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded">2</button>
+          <button onclick="recordStat('serve', 3)" class="py-2 bg-amber-900/60 hover:bg-amber-600 text-amber-200 text-xs font-bold rounded border border-amber-500/40">3</button>
           <button onclick="recordStat('serve', 4)" class="py-2 bg-emerald-900/60 hover:bg-emerald-600 text-emerald-200 text-xs font-bold rounded border border-emerald-500/40">4 (Ace)</button>
         </div>
       </div>
 
       <!-- ATTACKING & DEFENSE -->
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-2 gap-2">
         <div>
           <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Attacking</label>
           <div class="flex flex-col gap-1.5">
             <button onclick="recordStat('kill', 1)" class="py-2 bg-emerald-600 hover:bg-emerald-500 font-bold text-xs rounded">Kill (+1)</button>
-            <button onclick="recordStat('attack_err', 1)" class="py-2 bg-red-600 hover:bg-red-500 font-bold text-xs rounded">Attack Error (-1)</button>
+            <button onclick="recordStat('attack_err', 1)" class="py-2 bg-red-600 hover:bg-red-500 font-bold text-xs rounded">Error (-1)</button>
           </div>
         </div>
         <div>
@@ -165,7 +189,7 @@
         </div>
       </div>
 
-      <button onclick="closeStatModal()" class="mt-2 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-xs rounded border border-slate-600">
+      <button onclick="closeStatModal()" class="mt-1 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-xs rounded border border-slate-600">
         <i class="fa-solid fa-arrow-left mr-1"></i> Return to Court GUI
       </button>
     </div>
@@ -197,45 +221,61 @@
         <div class="grid grid-cols-2 gap-2">
           <div><label class="text-[10px] text-slate-400">Pos 1 (Back Right):</label><input id="p1-num" type="text" value="4" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
           <div><label class="text-[10px] text-slate-400">Pos 2 (Front Right):</label><input id="p2-num" type="text" value="2" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
-          <div><label class="text-[10px] text-slate-400">Pos 3 (Front Mid - MB):</label><input id="p3-num" type="text" value="5" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
+          <div><label class="text-[10px] text-slate-400">Pos 3 (Front Mid):</label><input id="p3-num" type="text" value="5" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
           <div><label class="text-[10px] text-slate-400">Pos 4 (Front Left):</label><input id="p4-num" type="text" value="12" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
           <div><label class="text-[10px] text-slate-400">Pos 5 (Back Left):</label><input id="p5-num" type="text" value="8" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
-          <div><label class="text-[10px] text-slate-400">Pos 6 (Back Mid - MB):</label><input id="p6-num" type="text" value="15" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
+          <div><label class="text-[10px] text-slate-400">Pos 6 (Back Mid):</label><input id="p6-num" type="text" value="15" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white" /></div>
         </div>
       </div>
 
-      <button onclick="saveSetup()" class="py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded text-sm mt-2">
-        Save Lineup & Return to Game
+      <div class="flex gap-2">
+        <button onclick="saveSetup()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded text-sm">
+          Save & Apply
+        </button>
+        <button onclick="closeSetupModal()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded text-sm">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY & SAVED GAMES MODAL -->
+  <div id="historyModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-md p-5 flex flex-col gap-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+        <h2 class="text-lg font-bold text-amber-400"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Game History</h2>
+        <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white text-xl p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <button onclick="startNewGame()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded text-xs flex justify-center items-center gap-2">
+        <i class="fa-solid fa-plus"></i> Start New Game / Reset
       </button>
+
+      <div class="flex flex-col gap-2">
+        <h3 class="text-xs font-bold uppercase text-slate-400">Saved Matches</h3>
+        <div id="savedGamesList" class="flex flex-col gap-2">
+          <!-- Populated via JavaScript -->
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- APPLICATION LOGIC -->
   <script>
-    // State variables
     let opponent = "Eagles";
     let setNumber = 1;
     let liberoNumber = "1";
     let currentPosSelected = null;
+    let matchId = Date.now().toString();
 
-    // Court positions state: key = position on court (1-6), value = jersey number string
-    let court = {
-      1: "4",
-      2: "2",
-      3: "5",
-      4: "12",
-      5: "8",
-      6: "15"
-    };
-
-    // Sub state to track original Middle Blockers when Libero is in
-    let originalMiddles = { 6: null, 5: null, 1: null };
-
-    // Stats Log Array
+    let court = { 1: "4", 2: "2", 3: "5", 4: "12", 5: "8", 6: "15" };
+    let originalPlayersBeforeLibero = { 1: null, 5: null, 6: null };
     let statLogs = [];
 
-    // Initialize UI on page load
     window.onload = function() {
+      loadLatestActiveMatch();
       updateCourtGUI();
       updateBoxScore();
     };
@@ -246,7 +286,7 @@
         const playerNum = court[pos];
         const isLibero = (playerNum === liberoNumber);
 
-        circleEl.className = `w-14 h-14 rounded-full border-2 flex flex-col items-center justify-center shadow-lg mt-1 ${
+        circleEl.className = `w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 flex flex-col items-center justify-center shadow-lg mt-1 ${
           isLibero ? 'bg-indigo-600 border-white' : 'bg-slate-800 border-amber-400'
         }`;
         
@@ -259,7 +299,6 @@
     }
 
     function rotateCourt() {
-      // Clockwise Rotation: 1->6, 6->5, 5->4, 4->3, 3->2, 2->1
       const newCourt = {
         1: court[2],
         2: court[3],
@@ -270,36 +309,45 @@
       };
       court = newCourt;
       updateCourtGUI();
+      saveCurrentMatchState(false);
     }
 
-    function swapLibero() {
-      // Prompt user which back-row spot to swap Libero into (Positions 1, 6, 5)
-      const targetPos = prompt("Enter Back-Row Position to swap Libero into (1, 5, or 6):", "6");
-      if (!targetPos || !["1", "5", "6"].includes(targetPos)) return;
-
-      const pos = parseInt(targetPos);
+    function toggleLiberoSpot(event, pos) {
+      event.stopPropagation(); // Prevents opening stat modal when tapping 'L' button
       if (court[pos] === liberoNumber) {
-        // Swap original Middle back in
-        if (originalMiddles[pos]) {
-          court[pos] = originalMiddles[pos];
-          originalMiddles[pos] = null;
+        if (originalPlayersBeforeLibero[pos]) {
+          court[pos] = originalPlayersBeforeLibero[pos];
+          originalPlayersBeforeLibero[pos] = null;
         } else {
-          alert("Middle Blocker number not remembered. Edit in setup.");
+          court[pos] = "5"; // Default fallback
         }
       } else {
-        // Save current middle, bring in Libero
-        originalMiddles[pos] = court[pos];
+        originalPlayersBeforeLibero[pos] = court[pos];
         court[pos] = liberoNumber;
       }
       updateCourtGUI();
+      saveCurrentMatchState(false);
     }
 
     function tapPosition(pos) {
       currentPosSelected = pos;
       const playerNum = court[pos];
       document.getElementById('modalPlayerTitle').innerText = `Player #${playerNum}`;
-      document.getElementById('modalPosTitle').innerText = `Logging event for Court Position ${pos}`;
+      document.getElementById('modalPosTitle').innerText = `Logging stat for Court Position ${pos}`;
+      document.getElementById('subPlayerInput').value = '';
       document.getElementById('statModal').classList.remove('hidden');
+    }
+
+    function applyPlayerSub() {
+      if (!currentPosSelected) return;
+      const newNum = document.getElementById('subPlayerInput').value.trim();
+      if (newNum !== '') {
+        court[currentPosSelected] = newNum;
+        document.getElementById('modalPlayerTitle').innerText = `Player #${newNum}`;
+        document.getElementById('subPlayerInput').value = '';
+        updateCourtGUI();
+        saveCurrentMatchState(false);
+      }
     }
 
     function closeStatModal() {
@@ -323,10 +371,10 @@
 
       closeStatModal();
       updateBoxScore();
+      saveCurrentMatchState(false);
     }
 
     function updateBoxScore() {
-      // Aggregate stats per player
       const summary = {};
 
       statLogs.forEach(entry => {
@@ -352,7 +400,7 @@
 
       const players = Object.keys(summary);
       if (players.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500">No stats recorded yet. Tap any spot on the court to begin.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500">No stats recorded yet. Tap any court spot to begin.</td></tr>`;
         return;
       }
 
@@ -374,8 +422,129 @@
       });
     }
 
+    // SAVED GAMES & LOCALSTORAGE LOGIC
+    function saveCurrentMatchState(showAlert = false) {
+      const matchData = {
+        id: matchId,
+        opponent: opponent,
+        setNumber: setNumber,
+        liberoNumber: liberoNumber,
+        court: court,
+        statLogs: statLogs,
+        lastUpdated: new Date().toLocaleString()
+      };
+
+      let savedGames = JSON.parse(localStorage.getItem('vb_saved_games') || '{}');
+      savedGames[matchId] = matchData;
+      localStorage.setItem('vb_saved_games', JSON.stringify(savedGames));
+      localStorage.setItem('vb_active_match_id', matchId);
+
+      if (showAlert) {
+        alert("Game saved successfully!");
+      }
+    }
+
+    function loadLatestActiveMatch() {
+      const activeId = localStorage.getItem('vb_active_match_id');
+      const savedGames = JSON.parse(localStorage.getItem('vb_saved_games') || '{}');
+
+      if (activeId && savedGames[activeId]) {
+        const g = savedGames[activeId];
+        matchId = g.id;
+        opponent = g.opponent;
+        setNumber = g.setNumber;
+        liberoNumber = g.liberoNumber;
+        court = g.court;
+        statLogs = g.statLogs || [];
+      }
+    }
+
+    function openHistoryModal() {
+      const savedGames = JSON.parse(localStorage.getItem('vb_saved_games') || '{}');
+      const container = document.getElementById('savedGamesList');
+      container.innerHTML = '';
+
+      const keys = Object.keys(savedGames);
+      if (keys.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic">No saved games found.</p>`;
+      } else {
+        keys.forEach(id => {
+          const g = savedGames[id];
+          const div = document.createElement('div');
+          div.className = "bg-slate-900 p-2.5 rounded border border-slate-700 flex justify-between items-center";
+          div.innerHTML = `
+            <div>
+              <p class="text-xs font-bold text-amber-400">vs ${g.opponent} (Set ${g.setNumber})</p>
+              <p class="text-[10px] text-slate-400">${g.lastUpdated} | Logs: ${g.statLogs ? g.statLogs.length : 0}</p>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="loadGame('${g.id}')" class="px-2 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 text-[10px] font-bold rounded">Load</button>
+              <button onclick="deleteGame('${g.id}')" class="px-2 py-1 bg-red-600 hover:bg-red-500 text-white text-[10px] font-bold rounded"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      document.getElementById('historyModal').classList.remove('hidden');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('historyModal').classList.add('hidden');
+    }
+
+    function loadGame(id) {
+      const savedGames = JSON.parse(localStorage.getItem('vb_saved_games') || '{}');
+      if (savedGames[id]) {
+        const g = savedGames[id];
+        matchId = g.id;
+        opponent = g.opponent;
+        setNumber = g.setNumber;
+        liberoNumber = g.liberoNumber;
+        court = g.court;
+        statLogs = g.statLogs || [];
+        localStorage.setItem('vb_active_match_id', id);
+
+        updateCourtGUI();
+        updateBoxScore();
+        closeHistoryModal();
+      }
+    }
+
+    function deleteGame(id) {
+      if (!confirm("Are you sure you want to delete this saved game?")) return;
+      let savedGames = JSON.parse(localStorage.getItem('vb_saved_games') || '{}');
+      delete savedGames[id];
+      localStorage.setItem('vb_saved_games', JSON.stringify(savedGames));
+      openHistoryModal();
+    }
+
+    function startNewGame() {
+      if (!confirm("Start a new game? Current state will be saved in history.")) return;
+      matchId = Date.now().toString();
+      statLogs = [];
+      saveCurrentMatchState(false);
+      updateCourtGUI();
+      updateBoxScore();
+      closeHistoryModal();
+      openSetupModal();
+    }
+
     function openSetupModal() {
+      document.getElementById('opponentInput').value = opponent;
+      document.getElementById('setNumInput').value = setNumber;
+      document.getElementById('liberoInput').value = liberoNumber;
+      document.getElementById('p1-num').value = court[1];
+      document.getElementById('p2-num').value = court[2];
+      document.getElementById('p3-num').value = court[3];
+      document.getElementById('p4-num').value = court[4];
+      document.getElementById('p5-num').value = court[5];
+      document.getElementById('p6-num').value = court[6];
       document.getElementById('setupModal').classList.remove('hidden');
+    }
+
+    function closeSetupModal() {
+      document.getElementById('setupModal').classList.add('hidden');
     }
 
     function saveSetup() {
@@ -390,8 +559,9 @@
       court[5] = document.getElementById('p5-num').value;
       court[6] = document.getElementById('p6-num').value;
 
-      document.getElementById('setupModal').classList.add('hidden');
+      closeSetupModal();
       updateCourtGUI();
+      saveCurrentMatchState(false);
     }
 
     function exportCSV() {
