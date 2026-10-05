@@ -360,7 +360,7 @@
 
   <!-- JavaScript Application Logic -->
   <script>
-    // Initial Fallback Multi-Team Data Store
+    // initial team data
     const DEFAULT_TEAM_DATA = {
       activeTeamId: "team_default",
       teams: {
@@ -381,7 +381,7 @@
       }
     };
 
-    // Global State
+    // global state
     let appTeamsData = loadAllTeamsFromStorage();
     let activeTeamId = appTeamsData.activeTeamId;
     let teamRoster = appTeamsData.teams[activeTeamId].roster;
@@ -389,14 +389,14 @@
 
     let court = { 1: "4", 2: "2", 3: "5", 4: "12", 5: "8", 6: "15" };
     let liberoNumber = "1";
-    let activeLiberoSubPos = null; // Track if Libero is subbed into position 5 or 6
+    let activeLiberoSubPos = null; // libero track
     let originalPlayerBeforeLibero = null;
 
     let matchId = Date.now().toString();
     let statLogs = [];
     let currentPosSelected = null;
 
-    // Load multi-team dataset from browser storage
+    // load team from data set
     function loadAllTeamsFromStorage() {
       const stored = localStorage.getItem('vb_app_teams_data');
       if (stored) {
@@ -405,7 +405,7 @@
       return DEFAULT_TEAM_DATA;
     }
 
-    // Persist complete multi-team dataset to browser storage
+    // team to browser storage
     function saveAllTeamsToStorage() {
       appTeamsData.activeTeamId = activeTeamId;
       appTeamsData.teams[activeTeamId].roster = teamRoster;
@@ -414,7 +414,7 @@
       updateActiveTeamLabel();
     }
 
-    // Initialize Active Court State from active team default lineup
+    // initialize active team lineup to court
     function applyActiveTeamLineupToCourt() {
       for (let pos = 1; pos <= 6; pos++) {
         court[pos] = defaultStartingLineup[pos] || "1";
@@ -424,13 +424,13 @@
       updateCourtGUI();
     }
 
-    // Lookup Player Name from Number
+    // lookup player
     function getPlayerName(num) {
       const match = teamRoster.find(p => p.num === num);
       return match ? match.name : "";
     }
 
-    // Render Court Circles
+    // court circle gui
     function updateCourtGUI() {
       for (let pos = 1; pos <= 6; pos++) {
         const circleEl = document.getElementById(`circle-${pos}`);
@@ -447,7 +447,7 @@
       document.getElementById('liberoStatusDisplay').innerText = `Active Libero: #${liberoNumber} (${getPlayerName(liberoNumber)})`;
     }
 
-    // Rotate Court clockwise or counter-clockwise
+    // rotation
     function rotateCourt(direction = 'cw') {
       if (direction === 'cw') {
         const temp1 = court[1];
@@ -470,7 +470,7 @@
       saveCurrentMatchState(false);
     }
 
-    // Quick Libero Sub
+    // quick lib sub
     function toggleLiberoSub(posStr) {
       const pos = parseInt(posStr);
       if (court[pos] === liberoNumber) {
@@ -488,7 +488,7 @@
       saveCurrentMatchState(false);
     }
 
-    // Open Action Modal
+    // open stat modal
     function openStatModal(pos) {
       currentPosSelected = pos;
       const num = court[pos];
@@ -506,7 +506,7 @@
       currentPosSelected = null;
     }
 
-    // Dynamic Bench Buttons for Subbing in Modal
+    // sub button models
     function renderBenchSubButtons() {
       const container = document.getElementById('benchSubContainer');
       container.innerHTML = '';
@@ -529,7 +529,7 @@
       saveCurrentMatchState(false);
     }
 
-    // Log Action Item
+    // log action
     function logStat(type, value) {
       if (!currentPosSelected) return;
 
@@ -553,19 +553,19 @@
       closeStatModal();
     }
 
-    // Update Summary Box Score Table
+    // update summary box
     function updateBoxScore() {
       const tbody = document.getElementById('boxScoreTbody');
       tbody.innerHTML = '';
 
       const statsMap = {};
 
-      // Initialize all roster players in table
+      // initialize players stats
       teamRoster.forEach(p => {
         statsMap[p.num] = { kills: 0, errors: 0, aces: 0, sErrors: 0, digs: 0, blocks: 0, passes: [] };
       });
 
-      // Accumulate logged stats
+      // add logged stats to data
       statLogs.forEach(log => {
         if (!statsMap[log.player]) {
           statsMap[log.player] = { kills: 0, errors: 0, aces: 0, sErrors: 0, digs: 0, blocks: 0, passes: [] };
@@ -602,7 +602,7 @@
       });
     }
 
-    // Multi-Team Manager Modal Functions
+    // team manager settings
     function openTeamManagerModal() {
       renderTeamsList();
       document.getElementById('teamManagerModal').classList.remove('hidden');
@@ -713,7 +713,7 @@
       }
     }
 
-    // Team Setup Modal Functions
+    // team setup
     function openTeamSetupModal() {
       renderRosterEditorInputs();
       populateLineupSelectDropdowns();
@@ -807,7 +807,7 @@
       closeTeamSetupModal();
     }
 
-    // Match Persistence & Exports
+    // match persistence
     function saveCurrentMatchState(isUIOnly = false) {
       const state = {
         court,
@@ -866,7 +866,7 @@
       document.body.removeChild(link);
     }
 
-    // App Initialization
+    // initialize app
     document.addEventListener('DOMContentLoaded', () => {
       updateActiveTeamLabel();
       loadSavedMatchState();
