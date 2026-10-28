@@ -107,75 +107,55 @@ function updateCourtGUI() {
 // rotation handler
 function rotateCourt(direction = 'cw') {
   try {
-    // 1. Record the bounding rects of all 6 court circles BEFORE rotation
-    const oldRects = {};
+    // 1. Add a sliding transition class to all court nodes before rotating
     for (let pos = 1; pos <= 6; pos++) {
-      const el = document.getElementById(`circle-${pos}`);
-      if (el) {
-        oldRects[pos] = el.getBoundingClientRect();
+      const nodeEl = document.getElementById(`node-${pos}`);
+      if (nodeEl) {
+        nodeEl.style.transition = 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+        nodeEl.style.transform = direction === 'cw' ? 'translateY(15px) scale(0.9)' : 'translateY(-15px) scale(0.9)';
+        nodeEl.style.opacity = '0.4';
       }
     }
 
-    // 2. Perform rotation data logic
-    if (direction === 'cw') {
-      const temp1 = court[1];
-      court[1] = court[2];
-      court[2] = court[3];
-      court[3] = court[4];
-      court[4] = court[5];
-      court[5] = court[6];
-      court[6] = temp1;
-    } else {
-      const temp1 = court[1];
-      court[1] = court[6];
-      court[6] = court[5];
-      court[5] = court[4];
-      court[4] = court[3];
-      court[3] = court[2];
-      court[2] = temp1;
-    }
-
-    // 3. Re-render the court GUI with the new player assignments
-    updateCourtGUI();
-
-    // 4. FLIP Animation: Animate each circle gliding from its previous source position
-    for (let newPos = 1; newPos <= 6; newPos++) {
-      let oldPos;
+    // 2. Perform rotation data logic after a tiny micro-delay for the exit transition
+    setTimeout(() => {
       if (direction === 'cw') {
-        // In CW rotation, the player arriving at newPos came from the previous zone
-        oldPos = (newPos % 6) + 1;
+        const temp1 = court[1];
+        court[1] = court[2];
+        court[2] = court[3];
+        court[3] = court[4];
+        court[4] = court[5];
+        court[5] = court[6];
+        court[6] = temp1;
       } else {
-        // In CCW rotation, the player arriving at newPos came from the next zone
-        oldPos = newPos === 1 ? 6 : newPos - 1;
+        const temp1 = court[1];
+        court[1] = court[6];
+        court[6] = court[5];
+        court[5] = court[4];
+        court[4] = court[3];
+        court[3] = court[2];
+        court[2] = temp1;
       }
 
-      const newEl = document.getElementById(`circle-${newPos}`);
-      const oldRect = oldRects[oldPos];
+      // Re-render the court GUI with the new player assignments
+      updateCourtGUI();
 
-      if (newEl && oldRect) {
-        const newRect = newEl.getBoundingClientRect();
-        const dx = oldRect.left - newRect.left;
-        const dy = oldRect.top - newRect.top;
-
-        if (dx !== 0 || dy !== 0) {
-          // Invert: snap instantly to the old position without transition
-          newEl.style.transform = `translate(${dx}px, ${dy}px)`;
-          newEl.style.transition = 'none';
-
-          // Force browser reflow
-          void newEl.offsetWidth;
-
-          // Play: smoothly slide to the new zone position (0,0)
-          newEl.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
-          newEl.style.transform = 'translate(0, 0)';
+      // 3. Animate nodes sliding smoothly back into place
+      for (let pos = 1; pos <= 6; pos++) {
+        const nodeEl = document.getElementById(`node-${pos}`);
+        if (nodeEl) {
+          nodeEl.style.transform = 'translateY(0) scale(1)';
+          nodeEl.style.opacity = '1';
         }
       }
-    }
+
+      saveCurrentMatchState(false);
+    }, 150);
+
   } catch (err) {
     console.error("Error during rotation animation:", err);
+    saveCurrentMatchState(false);
   }
-
-  saveCurrentMatchState(false);
 }
 
 // quick libero sub
