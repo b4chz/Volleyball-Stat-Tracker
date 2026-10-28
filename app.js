@@ -107,12 +107,15 @@ function updateCourtGUI() {
 // rotation handler
 function rotateCourt(direction = 'cw') {
   try {
-    // 1. Capture the screen rectangles (positions) of all 6 circles BEFORE rotation
-    const oldRects = {};
+    // 1. Capture screen positions and HTML content of every player before moving
+    const playerRects = {};
+    const playerHtml = {};
     for (let pos = 1; pos <= 6; pos++) {
+      const playerNum = court[pos];
       const el = document.getElementById(`circle-${pos}`);
-      if (el) {
-        oldRects[pos] = el.getBoundingClientRect();
+      if (el && playerNum) {
+        playerRects[playerNum] = el.getBoundingClientRect();
+        playerHtml[playerNum] = el.innerHTML;
       }
     }
 
@@ -135,54 +138,59 @@ function rotateCourt(direction = 'cw') {
       court[2] = temp1;
     }
 
-    // 3. Re-render the court GUI with the new player assignments
+    // 3. Update the underlying court GUI normally
     updateCourtGUI();
 
-    // 4. Animate each circle gliding from its old zone position to its new zone position
-    for (let newPos = 1; newPos <= 6; newPos++) {
-      // Determine which old zone this new position received its player from
-      let oldPos;
-      if (direction === 'cw') {
-        // In CW, the player at newPos came from the previous position (e.g., pos 1 came from pos 2)
-        oldPos = newPos === 6 ? 1 : newPos + 1;
-      } else {
-        // In CCW, the player at newPos came from the next position (e.g., pos 1 came from pos 6)
-        oldPos = newPos === 1 ? 6 : newPos - 1;
-      }
+    // 4. Create flying clones that physically glide from old zone to new zone
+    const activeClones = [];
+    for (let pos = 1; pos <= 6; pos++) {
+      const playerNum = court[pos];
+      const targetEl = document.getElementById(`circle-${pos}`);
+      const oldRect = playerRects[playerNum];
+      const htmlContent = playerHtml[playerNum];
 
-      const newEl = document.getElementById(`circle-${newPos}`);
-      const oldRect = oldRects[oldPos];
+      if (targetEl && oldRect && htmlContent) {
+        // Temporarily hide the destination circle so the flying clone takes center stage
+        targetEl.style.opacity = '0';
+        const newRect = targetEl.getBoundingClientRect();
 
-      if (newEl && oldRect) {
-        const newRect = newEl.getBoundingClientRect();
-        const dx = oldRect.left - newRect.left;
-        const dy = oldRect.top - newRect.top;
+        // Spawn a floating clone at the old player's screen position
+        const clone = document.createElement('div');
+        clone.className = targetEl.className + ' fixed z-50 pointer-events-none shadow-2xl';
+        clone.style.width = `${oldRect.width}px`;
+        clone.style.height = `${oldRect.height}px`;
+        clone.style.left = `${oldRect.left}px`;
+        clone.style.top = `${oldRect.top}px`;
+        clone.style.transition = 'all 0.45s cubic-bezier(0.16, 1, 0.3, 1)';
+        clone.innerHTML = htmlContent;
+        document.body.appendChild(clone);
 
-        if (dx !== 0 || dy !== 0) {
-          // Temporarily add transition class
-          newEl.classList.add('court-circle-transition');
-          
-          // Invert: jump instantly to where it used to be
-          newEl.style.transform = `translate(${dx}px, ${dy}px)`;
-          
-          // Force browser reflow
-          void newEl.offsetWidth;
+        // Force browser reflow
+        void clone.offsetWidth;
 
-          // Play: glide smoothly to its new home (0, 0)
-          newEl.style.transform = 'translate(0px, 0px)';
+        // Glide the clone across the screen to the new zone position
+        clone.style.left = `${newRect.left}px`;
+        clone.style.top = `${newRect.top}px`;
 
-          // Clean up inline style after animation completes so layout stays normal
-          setTimeout(() => {
-            if (newEl) {
-              newEl.style.transform = '';
-              newEl.classList.remove('court-circle-transition');
-            }
-          }, 400);
-        }
+        activeClones.push({ clone, targetEl });
       }
     }
+
+    // 5. Clean up clones and reveal the stationary court circles once flight completes
+    setTimeout(() => {
+      activeClones.forEach(({ clone, targetEl }) => {
+        if (clone && clone.parentNode) {
+          clone.parentNode.removeChild(clone);
+        }
+        if (targetEl) {
+          targetEl.style.opacity = '1';
+        }
+      });
+    }, 460);
+
   } catch (err) {
     console.error("Error during rotation animation:", err);
+    updateCourtGUI();
   }
 
   saveCurrentMatchState(false);
