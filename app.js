@@ -107,15 +107,17 @@ function updateCourtGUI() {
 // rotation handler
 function rotateCourt(direction = 'cw') {
   try {
+    // 1. FIRST: Record the screen bounding rect of each player before rotating
     const oldPlayerRects = {};
     for (let pos = 1; pos <= 6; pos++) {
       const playerNum = court[pos];
-      const circleEl = document.getElementById(`circle-${pos}`);
-      if (circleEl && playerNum) {
-        oldPlayerRects[playerNum] = circleEl.getBoundingClientRect();
+      const circleElem = document.getElementById(`circle-${pos}`);
+      if (circleElem && playerNum) {
+        oldPlayerRects[playerNum] = circleElem.getBoundingClientRect();
       }
     }
 
+    // 2. Perform rotation data logic
     if (direction === 'cw') {
       const temp1 = court[1];
       court[1] = court[2];
@@ -134,8 +136,10 @@ function rotateCourt(direction = 'cw') {
       court[2] = temp1;
     }
 
+    // 3. LAST: Re-render the court GUI with the new player assignments
     updateCourtGUI();
 
+    // 4. INVERT & PLAY: Animate each circle sliding from its previous zone position
     for (let pos = 1; pos <= 6; pos++) {
       const playerNum = court[pos];
       const newEl = document.getElementById(`circle-${pos}`);
