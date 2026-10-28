@@ -127,10 +127,10 @@ function rotateCourt(direction = 'cw') {
   for (let pos = 1; pos <= 6; pos++) {
     const nodeEl = document.getElementById(`node-${pos}`);
     if (nodeEl) {
-      nodeEl.classList.remove('animate-rotation');
+      nodeEl.classList.remove('court-rotate-anim');
       // trigger reflow to restart animation
       void nodeEl.offsetWidth;
-      nodeEl.classList.add('animate-rotation');
+      nodeEl.classList.add('court-rotate-anim');
     }
   }
   saveCurrentMatchState(false);

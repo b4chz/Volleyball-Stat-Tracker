@@ -7,6 +7,23 @@
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  /* Smooth slide & fade animation for court rotations */
+  @keyframes slideInFromPrevious {
+    0% {
+      opacity: 0;
+      transform: scale(0.7) translateY(-10px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .court-rotate-anim {
+    animation: slideInFromPrevious 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+</style>
   
   <!-- FontAwesome Icons CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
