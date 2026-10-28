@@ -36,6 +36,58 @@ let matchId = Date.now().toString();
 let statLogs = [];
 let currentPosSelected = null;
 
+let middle1Number = null;
+let middle2Number = null;
+let activeLiberoForMiddle = null;
+
+function setMiddle(which, val) {
+  const num = val ? parseInt(val) : null;
+  if (which === 1) middle1Number = num;
+  if (which === 2) middle2Number = num;
+  saveCurrentMatchState(false);
+}
+
+function checkLiberoRotationRules() {
+  if (!liberoNumber) return;
+
+  // Find current position of libero on court (if any)
+  let liberoPos = null;
+  for (let pos = 1; pos <= 6; pos++) {
+    if (court[pos] === liberoNumber) {
+      liberoPos = pos;
+      break;
+    }
+  }
+
+  // RULE 1: If Libero is currently on court and rotates into FRONT ROW (zones 2, 3, 4), force middle back in!
+  if (liberoPos && [2, 3, 4].includes(liberoPos) && activeLiberoForMiddle) {
+    court[liberoPos] = activeLiberoForMiddle;
+    activeLiberoForMiddle = null;
+    showNotification(`Libero rotated to front row. Automatically swapped Middle #${court[liberoPos]} back in!`);
+    updateCourtGUI();
+    return;
+  }
+
+  // RULE 2: Check if either designated middle is in the BACK ROW (zones 1, 5, 6) and libero is off court
+  [middle1Number, middle2Number].forEach(midNum => {
+    if (!midNum) return;
+    let midPos = null;
+    for (let pos = 1; pos <= 6; pos++) {
+      if (court[pos] === midNum) {
+        midPos = pos;
+        break;
+      }
+    }
+
+    // If middle is in back row (1, 5, 6) and libero is NOT currently on court
+    if (midPos && [1, 5, 6].includes(midPos) && !liberoPos) {
+      // Optional auto-sub or prompt user. Let's make it smooth:
+      // You can auto-sub or display a quick action button on screen.
+      console.log(`Middle #${midNum} is in back row (Zone ${midPos}). Libero eligible to sub in!`);
+    }
+  });
+}
+
 // load team from data set
 function loadAllTeamsFromStorage() {
   const stored = localStorage.getItem('vb_app_teams_data');
@@ -142,6 +194,7 @@ function rotateCourt(direction = 'cw') {
 
     // 3. LAST: Re-render the court GUI with the new player assignments and styles
     updateCourtGUI();
+    checkLiberoRotationRules();
 
     // 4. INVERT & PLAY: Animate each node circle sliding from its previous zone position to its new one
     for (let newPos = 1; newPos <= 6; newPos++) {
