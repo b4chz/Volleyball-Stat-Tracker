@@ -123,6 +123,7 @@ function rotateCourt(direction = 'cw') {
     court[3] = court[2];
     court[2] = temp1;
   }
+  updateCourtGUI();
   for (let pos = 1; pos <= 6; pos++) {
     const nodeEl = document.getElementById(`node-${pos}`);
     if (nodeEl) {
@@ -132,7 +133,6 @@ function rotateCourt(direction = 'cw') {
       nodeEl.classList.add('animate-rotation');
     }
   }
-  updateCourtGUI();
   saveCurrentMatchState(false);
 }
 
