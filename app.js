@@ -85,6 +85,7 @@ function updateCourtGUI() {
     const playerName = getPlayerName(playerNum);
     const isLibero = liberoNumbers.includes(playerNum);
 
+
     if (nodeEl) {
       if (isLibero) {
         nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-indigo-950/90 border-2 border-indigo-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative overflow-hidden";
@@ -117,7 +118,6 @@ function updateCourtGUI() {
 // rotation handler
 function rotateCourt(direction = 'cw') {
   try {
-    // 1. FIRST: Capture the screen bounding rectangles of all 6 node circles BEFORE rotating data
     const oldRects = {};
     for (let pos = 1; pos <= 6; pos++) {
       const nodeEl = document.getElementById(`node-${pos}`);
@@ -126,7 +126,6 @@ function rotateCourt(direction = 'cw') {
       }
     }
 
-    // 2. Perform rotation data logic
     if (direction === 'cw') {
       const temp1 = court[1];
       court[1] = court[2];
@@ -145,18 +144,13 @@ function rotateCourt(direction = 'cw') {
       court[2] = temp1;
     }
 
-    // 3. LAST: Re-render the court GUI with the new player assignments and styles
     updateCourtGUI();
-    checkLiberoRotationRules();
 
-    // 4. INVERT & PLAY: Animate each node circle sliding from its previous zone position to its new one
     for (let newPos = 1; newPos <= 6; newPos++) {
       let oldPos;
       if (direction === 'cw') {
-        // In CW rotation, the node arriving at newPos came from the previous position
         oldPos = newPos === 6 ? 1 : newPos + 1;
       } else {
-        // In CCW rotation, the node arriving at newPos came from the next position
         oldPos = newPos === 1 ? 6 : newPos - 1;
       }
 
@@ -169,18 +163,12 @@ function rotateCourt(direction = 'cw') {
         const dy = oldRect.top - newRect.top;
 
         if (dx !== 0 || dy !== 0) {
-          // Invert: snap instantly back to where that circle used to be
           newNodeEl.style.transform = `translate(${dx}px, ${dy}px)`;
           newNodeEl.style.transition = 'none';
-
-          // Force browser reflow
           void newNodeEl.offsetWidth;
-
-          // Play: smoothly slide to the new zone position (0, 0)
           newNodeEl.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
           newNodeEl.style.transform = 'translate(0px, 0px)';
 
-          // Clean up inline transform after animation finishes
           setTimeout(() => {
             if (newNodeEl) {
               newNodeEl.style.transform = '';
@@ -194,67 +182,6 @@ function rotateCourt(direction = 'cw') {
     console.error("Error during node rotation animation:", err);
   }
 
-  saveCurrentMatchState(false);
-}
-
-// quick libero sub
-function toggleLiberoSub(posStr) {
-  const pos = parseInt(posStr);
-  if (court[pos] === liberoNumber) {
-    if (originalPlayerBeforeLibero) {
-      court[pos] = originalPlayerBeforeLibero;
-      originalPlayerBeforeLibero = null;
-    }
-    activeLiberoSubPos = null;
-  } else {
-    originalPlayerBeforeLibero = court[pos];
-    court[pos] = liberoNumber;
-    activeLiberoSubPos = pos;
-  }
-  updateCourtGUI();
-  saveCurrentMatchState(false);
-}
-
-function setTeamLibero(index, val) {
-  liberoNumbers[index] = val ? val : null;
-  saveCurrentMatchState(false);
-  updateCourtGUI();
-}
-
-// Quick-swap toggle function to bring a libero in or out of a specific court position (e.g., 1, 5, or 6)
-function toggleLiberoSub(courtPos) {
-  // Check if a libero is configured on the team
-  const activeLibero = liberoNumbers[0] || liberoNumbers[1];
-  if (!activeLibero) {
-    alert("Please configure at least one Libero in your team settings first!");
-    return;
-  }
-
-  const currentPlayer = court[courtPos];
-
-  // If there is already a libero in this position, swap the original player back in
-  if (liberoNumbers.includes(currentPlayer)) {
-    const originalPlayer = liberoSubbedOutByPos[courtPos];
-    if (originalPlayer) {
-      court[courtPos] = originalPlayer;
-      delete liberoSubbedOutByPos[courtPos];
-    } else {
-      // Fallback if original player wasn't tracked: swap back to Libero 1 slot or default
-      court[courtPos] = liberoNumbers[0]; 
-    }
-  } else {
-    // Otherwise, sub the libero in for the current player at this position
-    // We'll default to Libero 1 (index 0), or Libero 2 if Libero 1 is already on court somewhere else
-    let chosenLibero = liberoNumbers[0];
-    if (Object.values(court).includes(liberoNumbers[0]) && liberoNumbers[1]) {
-      chosenLibero = liberoNumbers[1];
-    }
-
-    liberoSubbedOutByPos[courtPos] = currentPlayer;
-    court[courtPos] = chosenLibero;
-  }
-
-  updateCourtGUI();
   saveCurrentMatchState(false);
 }
 
@@ -538,6 +465,7 @@ function renderRosterEditorInputs() {
   });
 }
 
+
 function addRosterRow() {
   teamRoster.push({ num: "", name: "" });
   renderRosterEditorInputs();
@@ -647,6 +575,81 @@ function startNewGame() {
   applyActiveTeamLineupToCourt();
   saveCurrentMatchState(false);
   updateBoxScore();
+}
+
+function populateLiberoDropdowns() {
+  const l1Select = document.getElementById('libero1Select');
+  const l2Select = document.getElementById('libero2Select');
+  if (!l1Select || !l2Select) return;
+
+  l1Select.innerHTML = '<option value="">Select Libero 1</option>';
+  l2Select.innerHTML = '<option value="">Select Libero 2</option>';
+
+  if (teamRoster && typeof teamRoster === 'object') {
+    Object.entries(teamRoster).forEach(([num, name]) => {
+      const opt1 = document.createElement('option');
+      opt1.value = num;
+      opt1.textContent = `#${num} - ${name}`;
+      l1Select.appendChild(opt1);
+
+      const opt2 = document.createElement('option');
+      opt2.value = num;
+      opt2.textContent = `#${num} - ${name}`;
+      l2Select.appendChild(opt2);
+    });
+  }
+
+  // Restore saved selections if any
+  if (liberoNumbers[0]) l1Select.value = liberoNumbers[0];
+  if (liberoNumbers[1]) l2Select.value = liberoNumbers[1];
+}
+
+// Set Libero 1 or Libero 2 from settings dropdowns
+function setTeamLibero(index, val) {
+  liberoNumbers[index] = val ? String(val) : null;
+  saveCurrentMatchState(false);
+  updateCourtGUI();
+}
+
+// Quick-swap toggle function for P1, P5, P6
+function toggleLiberoSub(courtPos) {
+  const activeLibero1 = liberoNumbers[0];
+  const activeLibero2 = liberoNumbers[1];
+
+  if (!activeLibero1 && !activeLibero2) {
+    alert("Please configure at least one Libero in your team settings first!");
+    return;
+  }
+
+  const currentPlayer = String(court[courtPos]);
+  const libList = [activeLibero1, activeLibero2].filter(Boolean);
+
+  // If current player is already a libero, swap the original player back in
+  if (libList.includes(currentPlayer)) {
+    const originalPlayer = liberoSubbedOutByPos[courtPos];
+    if (originalPlayer) {
+      court[courtPos] = originalPlayer;
+      delete liberoSubbedOutByPos[courtPos];
+    } else {
+      court[courtPos] = defaultStartingLineup[courtPos] || "1";
+    }
+  } else {
+    // Choose which libero to sub in (prefer Libero 1 if not already on court, else Libero 2)
+    let chosenLibero = activeLibero1;
+    const currentCourtPlayers = Object.values(court).map(String);
+
+    if (currentCourtPlayers.includes(String(activeLibero1)) && activeLibero2) {
+      chosenLibero = activeLibero2;
+    } else if (!activeLibero1 && activeLibero2) {
+      chosenLibero = activeLibero2;
+    }
+
+    liberoSubbedOutByPos[courtPos] = currentPlayer;
+    court[courtPos] = chosenLibero;
+  }
+
+  updateCourtGUI();
+  saveCurrentMatchState(false);
 }
 
 function exportCSV() {
