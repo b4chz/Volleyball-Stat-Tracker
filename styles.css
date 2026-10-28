@@ -33,3 +33,12 @@ body {
   background: rgba(100, 116, 139, 0.5);
   border-radius: 3px;
 }
+@keyframes courtRotatePulse {
+  0% { transform: scale(0.85); opacity: 0.5; filter: brightness(0.7); }
+  50% { transform: scale(1.1); opacity: 1; filter: brightness(1.2); }
+  100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+}
+
+.animate-rotation {
+  animation: courtRotatePulse 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
