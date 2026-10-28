@@ -112,15 +112,14 @@ function updateCourtGUI() {
 // rotation handler
 function rotateCourt(direction = 'cw') {
   try {
-    // 1. FIRST: Snapshot the exact screen bounding box of every player token before rotating
+    // 1. FIRST: Capture the screen bounding rectangles of all 6 node circles BEFORE rotating data
     const oldRects = {};
-    const tokens = document.querySelectorAll('[id^="player-token-"]');
-    tokens.forEach(token => {
-      const pNum = token.getAttribute('data-player-num');
-      if (pNum) {
-        oldRects[pNum] = token.getBoundingClientRect();
+    for (let pos = 1; pos <= 6; pos++) {
+      const nodeEl = document.getElementById(`node-${pos}`);
+      if (nodeEl) {
+        oldRects[pos] = nodeEl.getBoundingClientRect();
       }
-    });
+    }
 
     // 2. Perform rotation data logic
     if (direction === 'cw') {
@@ -141,36 +140,52 @@ function rotateCourt(direction = 'cw') {
       court[2] = temp1;
     }
 
-    // 3. LAST: Re-render the court GUI with the new positions
+    // 3. LAST: Re-render the court GUI with the new player assignments and styles
     updateCourtGUI();
 
-    // 4. INVERT & PLAY: Animate each player token sliding from its old screen position to its new spot
-    const newTokens = document.querySelectorAll('[id^="player-token-"]');
-    newTokens.forEach(newToken => {
-      const pNum = newToken.getAttribute('data-player-num');
-      const oldRect = oldRects[pNum];
+    // 4. INVERT & PLAY: Animate each node circle sliding from its previous zone position to its new one
+    for (let newPos = 1; newPos <= 6; newPos++) {
+      let oldPos;
+      if (direction === 'cw') {
+        // In CW rotation, the node arriving at newPos came from the previous position
+        oldPos = newPos === 6 ? 1 : newPos + 1;
+      } else {
+        // In CCW rotation, the node arriving at newPos came from the next position
+        oldPos = newPos === 1 ? 6 : newPos - 1;
+      }
 
-      if (pNum && oldRect) {
-        const newRect = newToken.getBoundingClientRect();
+      const newNodeEl = document.getElementById(`node-${newPos}`);
+      const oldRect = oldRects[oldPos];
+
+      if (newNodeEl && oldRect) {
+        const newRect = newNodeEl.getBoundingClientRect();
         const dx = oldRect.left - newRect.left;
         const dy = oldRect.top - newRect.top;
 
         if (dx !== 0 || dy !== 0) {
-          // Invert: snap instantly to the old screen position without transition
-          newToken.style.transform = `translate(${dx}px, ${dy}px)`;
-          newToken.style.transition = 'none';
+          // Invert: snap instantly back to where that circle used to be
+          newNodeEl.style.transform = `translate(${dx}px, ${dy}px)`;
+          newNodeEl.style.transition = 'none';
 
           // Force browser reflow
-          void newToken.offsetWidth;
+          void newNodeEl.offsetWidth;
 
-          // Play: smoothly glide to the new zone position (0,0)
-          newToken.style.transition = 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)';
-          newToken.style.transform = 'translate(0px, 0px)';
+          // Play: smoothly slide to the new zone position (0, 0)
+          newNodeEl.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+          newNodeEl.style.transform = 'translate(0px, 0px)';
+
+          // Clean up inline transform after animation finishes
+          setTimeout(() => {
+            if (newNodeEl) {
+              newNodeEl.style.transform = '';
+              newNodeEl.style.transition = '';
+            }
+          }, 400);
         }
       }
-    });
+    }
   } catch (err) {
-    console.error("Error during token rotation animation:", err);
+    console.error("Error during node rotation animation:", err);
   }
 
   saveCurrentMatchState(false);
