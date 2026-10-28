@@ -72,29 +72,30 @@ function getPlayerName(num) {
 
 // court circle gui
 function updateCourtGUI() {
+  // First, ensure every zone container has its correct styling and clears old content
   for (let pos = 1; pos <= 6; pos++) {
-    const circleEl = document.getElementById(`circle-${pos}`);
     const nodeEl = document.getElementById(`node-${pos}`);
+    const circleEl = document.getElementById(`circle-${pos}`);
     const playerNum = court[pos];
     const playerName = getPlayerName(playerNum);
     const isLibero = (playerNum === liberoNumber);
 
     if (nodeEl) {
       if (isLibero) {
-        nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-indigo-950/90 border-2 border-indigo-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative";
+        nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-indigo-950/90 border-2 border-indigo-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative overflow-hidden";
       } else if (pos === 1) {
-        nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-emerald-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative";
+        nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-emerald-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative overflow-hidden";
       } else if (pos <= 4) {
-        nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-amber-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative";
+        nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-amber-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative overflow-hidden";
       } else {
-        nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-slate-300 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative";
+        nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-slate-300 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative overflow-hidden";
       }
     }
 
     if (circleEl) {
-      // Tag this inner content with the player's specific number so we can track their token
+      // Give each player a unique token ID so they can be tracked across zones
       circleEl.innerHTML = `
-        <div data-player-token="${playerNum}" class="w-full h-full flex flex-col items-center justify-center">
+        <div id="player-token-${playerNum}" data-player-num="${playerNum}" class="w-full h-full flex flex-col items-center justify-center cursor-pointer select-none">
           <span class="text-xs sm:text-sm ${isLibero ? 'text-indigo-300' : 'text-white'} font-black leading-none">#${playerNum}</span>
           <span class="text-[8px] sm:text-[9px] text-slate-200 font-bold truncate max-w-[48px] leading-tight mt-0.5">${playerName}</span>
         </div>
@@ -111,13 +112,13 @@ function updateCourtGUI() {
 // rotation handler
 function rotateCourt(direction = 'cw') {
   try {
-    // 1. FIRST: Snapshot the exact screen coordinates of every player's token before rotating
+    // 1. FIRST: Snapshot the exact screen bounding box of every player token before rotating
     const oldRects = {};
-    const tokens = document.querySelectorAll('[data-player-token]');
+    const tokens = document.querySelectorAll('[id^="player-token-"]');
     tokens.forEach(token => {
-      const playerId = token.getAttribute('data-player-token');
-      if (playerId) {
-        oldRects[playerId] = token.getBoundingClientRect();
+      const pNum = token.getAttribute('data-player-num');
+      if (pNum) {
+        oldRects[pNum] = token.getBoundingClientRect();
       }
     });
 
@@ -143,13 +144,13 @@ function rotateCourt(direction = 'cw') {
     // 3. LAST: Re-render the court GUI with the new positions
     updateCourtGUI();
 
-    // 4. INVERT & PLAY: Animate each player's token sliding from its old position to its new position
-    const newTokens = document.querySelectorAll('[data-player-token]');
+    // 4. INVERT & PLAY: Animate each player token sliding from its old screen position to its new spot
+    const newTokens = document.querySelectorAll('[id^="player-token-"]');
     newTokens.forEach(newToken => {
-      const playerId = newToken.getAttribute('data-player-token');
-      const oldRect = oldRects[playerId];
+      const pNum = newToken.getAttribute('data-player-num');
+      const oldRect = oldRects[pNum];
 
-      if (playerId && oldRect) {
+      if (pNum && oldRect) {
         const newRect = newToken.getBoundingClientRect();
         const dx = oldRect.left - newRect.left;
         const dy = oldRect.top - newRect.top;
