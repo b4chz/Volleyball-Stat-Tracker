@@ -107,55 +107,85 @@ function updateCourtGUI() {
 // rotation handler
 function rotateCourt(direction = 'cw') {
   try {
-    // 1. Add a sliding transition class to all court nodes before rotating
+    // 1. Capture the screen rectangles (positions) of all 6 circles BEFORE rotation
+    const oldRects = {};
     for (let pos = 1; pos <= 6; pos++) {
-      const nodeEl = document.getElementById(`node-${pos}`);
-      if (nodeEl) {
-        nodeEl.style.transition = 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
-        nodeEl.style.transform = direction === 'cw' ? 'translateY(15px) scale(0.9)' : 'translateY(-15px) scale(0.9)';
-        nodeEl.style.opacity = '0.4';
+      const el = document.getElementById(`circle-${pos}`);
+      if (el) {
+        oldRects[pos] = el.getBoundingClientRect();
       }
     }
 
-    // 2. Perform rotation data logic after a tiny micro-delay for the exit transition
-    setTimeout(() => {
+    // 2. Perform rotation data logic
+    if (direction === 'cw') {
+      const temp1 = court[1];
+      court[1] = court[2];
+      court[2] = court[3];
+      court[3] = court[4];
+      court[4] = court[5];
+      court[5] = court[6];
+      court[6] = temp1;
+    } else {
+      const temp1 = court[1];
+      court[1] = court[6];
+      court[6] = court[5];
+      court[5] = court[4];
+      court[4] = court[3];
+      court[3] = court[2];
+      court[2] = temp1;
+    }
+
+    // 3. Re-render the court GUI with the new player assignments
+    updateCourtGUI();
+
+    // 4. Animate each circle gliding from its old zone position to its new zone position
+    for (let newPos = 1; newPos <= 6; newPos++) {
+      // Determine which old zone this new position received its player from
+      let oldPos;
       if (direction === 'cw') {
-        const temp1 = court[1];
-        court[1] = court[2];
-        court[2] = court[3];
-        court[3] = court[4];
-        court[4] = court[5];
-        court[5] = court[6];
-        court[6] = temp1;
+        // In CW, the player at newPos came from the previous position (e.g., pos 1 came from pos 2)
+        oldPos = newPos === 6 ? 1 : newPos + 1;
       } else {
-        const temp1 = court[1];
-        court[1] = court[6];
-        court[6] = court[5];
-        court[5] = court[4];
-        court[4] = court[3];
-        court[3] = court[2];
-        court[2] = temp1;
+        // In CCW, the player at newPos came from the next position (e.g., pos 1 came from pos 6)
+        oldPos = newPos === 1 ? 6 : newPos - 1;
       }
 
-      // Re-render the court GUI with the new player assignments
-      updateCourtGUI();
+      const newEl = document.getElementById(`circle-${newPos}`);
+      const oldRect = oldRects[oldPos];
 
-      // 3. Animate nodes sliding smoothly back into place
-      for (let pos = 1; pos <= 6; pos++) {
-        const nodeEl = document.getElementById(`node-${pos}`);
-        if (nodeEl) {
-          nodeEl.style.transform = 'translateY(0) scale(1)';
-          nodeEl.style.opacity = '1';
+      if (newEl && oldRect) {
+        const newRect = newEl.getBoundingClientRect();
+        const dx = oldRect.left - newRect.left;
+        const dy = oldRect.top - newRect.top;
+
+        if (dx !== 0 || dy !== 0) {
+          // Temporarily add transition class
+          newEl.classList.add('court-circle-transition');
+          
+          // Invert: jump instantly to where it used to be
+          newEl.style.transform = `translate(${dx}px, ${dy}px)`;
+          
+          // Force browser reflow
+          void newEl.offsetWidth;
+
+          // Play: glide smoothly to its new home (0, 0)
+          newEl.style.transform = 'translate(0px, 0px)';
+
+          // Clean up inline style after animation completes so layout stays normal
+          setTimeout(() => {
+            if (newEl) {
+              newEl.style.transform = '';
+              newEl.classList.remove('court-circle-transition');
+            }
+          }, 400);
         }
       }
-
-      saveCurrentMatchState(false);
-    }, 150);
-
+    }
   } catch (err) {
     console.error("Error during rotation animation:", err);
-    saveCurrentMatchState(false);
   }
+
+  saveCurrentMatchState(false);
 }
 
 // quick libero sub
