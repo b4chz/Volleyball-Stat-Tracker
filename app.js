@@ -107,13 +107,12 @@ function updateCourtGUI() {
 // rotation handler
 function rotateCourt(direction = 'cw') {
   try {
-    // 1. FIRST: Record the screen bounding rect of each player before rotating
-    const oldPlayerRects = {};
+    // 1. Record the bounding rects of all 6 court circles BEFORE rotation
+    const oldRects = {};
     for (let pos = 1; pos <= 6; pos++) {
-      const playerNum = court[pos];
-      const circleElem = document.getElementById(`circle-${pos}`);
-      if (circleElem && playerNum) {
-        oldPlayerRects[playerNum] = circleElem.getBoundingClientRect();
+      const el = document.getElementById(`circle-${pos}`);
+      if (el) {
+        oldRects[pos] = el.getBoundingClientRect();
       }
     }
 
@@ -136,14 +135,22 @@ function rotateCourt(direction = 'cw') {
       court[2] = temp1;
     }
 
-    // 3. LAST: Re-render the court GUI with the new player assignments
+    // 3. Re-render the court GUI with the new player assignments
     updateCourtGUI();
 
-    // 4. INVERT & PLAY: Animate each circle sliding from its previous zone position
-    for (let pos = 1; pos <= 6; pos++) {
-      const playerNum = court[pos];
-      const newEl = document.getElementById(`circle-${pos}`);
-      const oldRect = oldPlayerRects[playerNum];
+    // 4. FLIP Animation: Animate each circle gliding from its previous source position
+    for (let newPos = 1; newPos <= 6; newPos++) {
+      let oldPos;
+      if (direction === 'cw') {
+        // In CW rotation, the player arriving at newPos came from the previous zone
+        oldPos = (newPos % 6) + 1;
+      } else {
+        // In CCW rotation, the player arriving at newPos came from the next zone
+        oldPos = newPos === 1 ? 6 : newPos - 1;
+      }
+
+      const newEl = document.getElementById(`circle-${newPos}`);
+      const oldRect = oldRects[oldPos];
 
       if (newEl && oldRect) {
         const newRect = newEl.getBoundingClientRect();
@@ -165,7 +172,7 @@ function rotateCourt(direction = 'cw') {
       }
     }
   } catch (err) {
-    console.error("Error during rotation:", err);
+    console.error("Error during rotation animation:", err);
   }
 
   saveCurrentMatchState(false);
