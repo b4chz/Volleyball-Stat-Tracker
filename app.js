@@ -106,6 +106,14 @@ function updateCourtGUI() {
 
 // rotation handler
 function rotateCourt(direction = 'cw') {
+    const oldPlayerRects = {};
+    for (let pos = 1; pos <= 6; pos++){
+        const playerNum = court[pos];
+        const nodeEl = document.getElementById('circle-${pos}');
+        if (circleEl && playerNum){
+            oldPlayerRects[playerNum] = circleEl.getBoundingClientRect();
+        }
+    }
   if (direction === 'cw') {
     const temp1 = court[1];
     court[1] = court[2];
@@ -125,12 +133,27 @@ function rotateCourt(direction = 'cw') {
   }
   updateCourtGUI();
   for (let pos = 1; pos <= 6; pos++) {
-    const nodeEl = document.getElementById(`node-${pos}`);
-    if (nodeEl) {
-      nodeEl.classList.remove('court-rotate-anim');
-      // trigger reflow to restart animation
-      void nodeEl.offsetWidth;
-      nodeEl.classList.add('court-rotate-anim');
+    const playerNum = court[pos];
+    const newEl = document.getElementById(`circle-${pos}`);
+    const oldRect = oldPlayerRects[playerNum];
+
+    if (newEl && oldRect) {
+      const newRect = newEl.getBoundingClientRect();
+      const dx = oldRect.left - newRect.left;
+      const dy = oldRect.top - newRect.top;
+
+      if (dx !== 0 || dy !== 0) {
+        // Invert: snap instantly to the old position without transition
+        newEl.style.transform = `translate(${dx}px, ${dy}px)`;
+        newEl.style.transition = 'none';
+
+        // Force browser reflow
+        void newEl.offsetWidth;
+
+        // Play: smoothly slide to the new zone position (0,0)
+        newEl.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+        newEl.style.transform = 'translate(0, 0)';
+      }
     }
   }
   saveCurrentMatchState(false);
