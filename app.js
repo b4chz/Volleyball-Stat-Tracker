@@ -28,65 +28,18 @@ let teamRoster = appTeamsData.teams[activeTeamId].roster;
 let defaultStartingLineup = appTeamsData.teams[activeTeamId].startingLineup;
 
 let court = { 1: "4", 2: "2", 3: "5", 4: "12", 5: "8", 6: "15" };
-let liberoNumber = "1";
-let activeLiberoSubPos = null;
-let originalPlayerBeforeLibero = null;
+
+// CHANGED: Support up to 2 liberos instead of 1 single libero
+let liberoNumbers = [null, null]; // [Libero 1, Libero 2]
+
+// Track which original player was subbed out for a libero at a specific court position
+// e.g., { 6: "8" } means Position 6 has a libero swapped in for player #8
+let liberoSubbedOutByPos = {}; 
 
 let matchId = Date.now().toString();
 let statLogs = [];
 let currentPosSelected = null;
 
-let middle1Number = null;
-let middle2Number = null;
-let activeLiberoForMiddle = null;
-
-function setMiddle(which, val) {
-  const num = val ? parseInt(val) : null;
-  if (which === 1) middle1Number = num;
-  if (which === 2) middle2Number = num;
-  saveCurrentMatchState(false);
-}
-
-function checkLiberoRotationRules() {
-  if (!liberoNumber) return;
-
-  // Find current position of libero on court (if any)
-  let liberoPos = null;
-  for (let pos = 1; pos <= 6; pos++) {
-    if (court[pos] === liberoNumber) {
-      liberoPos = pos;
-      break;
-    }
-  }
-
-  // RULE 1: If Libero is currently on court and rotates into FRONT ROW (zones 2, 3, 4), force middle back in!
-  if (liberoPos && [2, 3, 4].includes(liberoPos) && activeLiberoForMiddle) {
-    court[liberoPos] = activeLiberoForMiddle;
-    activeLiberoForMiddle = null;
-    showNotification(`Libero rotated to front row. Automatically swapped Middle #${court[liberoPos]} back in!`);
-    updateCourtGUI();
-    return;
-  }
-
-  // RULE 2: Check if either designated middle is in the BACK ROW (zones 1, 5, 6) and libero is off court
-  [middle1Number, middle2Number].forEach(midNum => {
-    if (!midNum) return;
-    let midPos = null;
-    for (let pos = 1; pos <= 6; pos++) {
-      if (court[pos] === midNum) {
-        midPos = pos;
-        break;
-      }
-    }
-
-    // If middle is in back row (1, 5, 6) and libero is NOT currently on court
-    if (midPos && [1, 5, 6].includes(midPos) && !liberoPos) {
-      // Optional auto-sub or prompt user. Let's make it smooth:
-      // You can auto-sub or display a quick action button on screen.
-      console.log(`Middle #${midNum} is in back row (Zone ${midPos}). Libero eligible to sub in!`);
-    }
-  });
-}
 
 // load team from data set
 function loadAllTeamsFromStorage() {
@@ -130,7 +83,7 @@ function updateCourtGUI() {
     const circleEl = document.getElementById(`circle-${pos}`);
     const playerNum = court[pos];
     const playerName = getPlayerName(playerNum);
-    const isLibero = (playerNum === liberoNumber);
+    const isLibero = liberoNumbers.includes(playerNum);
 
     if (nodeEl) {
       if (isLibero) {
@@ -258,6 +211,49 @@ function toggleLiberoSub(posStr) {
     court[pos] = liberoNumber;
     activeLiberoSubPos = pos;
   }
+  updateCourtGUI();
+  saveCurrentMatchState(false);
+}
+
+function setTeamLibero(index, val) {
+  liberoNumbers[index] = val ? val : null;
+  saveCurrentMatchState(false);
+  updateCourtGUI();
+}
+
+// Quick-swap toggle function to bring a libero in or out of a specific court position (e.g., 1, 5, or 6)
+function toggleLiberoSub(courtPos) {
+  // Check if a libero is configured on the team
+  const activeLibero = liberoNumbers[0] || liberoNumbers[1];
+  if (!activeLibero) {
+    alert("Please configure at least one Libero in your team settings first!");
+    return;
+  }
+
+  const currentPlayer = court[courtPos];
+
+  // If there is already a libero in this position, swap the original player back in
+  if (liberoNumbers.includes(currentPlayer)) {
+    const originalPlayer = liberoSubbedOutByPos[courtPos];
+    if (originalPlayer) {
+      court[courtPos] = originalPlayer;
+      delete liberoSubbedOutByPos[courtPos];
+    } else {
+      // Fallback if original player wasn't tracked: swap back to Libero 1 slot or default
+      court[courtPos] = liberoNumbers[0]; 
+    }
+  } else {
+    // Otherwise, sub the libero in for the current player at this position
+    // We'll default to Libero 1 (index 0), or Libero 2 if Libero 1 is already on court somewhere else
+    let chosenLibero = liberoNumbers[0];
+    if (Object.values(court).includes(liberoNumbers[0]) && liberoNumbers[1]) {
+      chosenLibero = liberoNumbers[1];
+    }
+
+    liberoSubbedOutByPos[courtPos] = currentPlayer;
+    court[courtPos] = chosenLibero;
+  }
+
   updateCourtGUI();
   saveCurrentMatchState(false);
 }
