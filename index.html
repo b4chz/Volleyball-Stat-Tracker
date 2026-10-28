@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Volleyball Stat Tracker & Rotation Manager</title>
   
   <!-- Tailwind CSS CDN -->
@@ -11,24 +11,8 @@
   <!-- FontAwesome Icons CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <style>
-    /* Custom court styling and layout adjustments */
-    .volleyball-court {
-      background: radial-gradient(circle, #f97316 0%, #ea580c 100%);
-      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
-    }
-    .court-line {
-      border-color: rgba(255, 255, 255, 0.9);
-    }
-    .attack-line {
-      border-color: rgba(255, 255, 255, 0.9);
-      border-style: dashed;
-    }
-    /* Prevent unwanted touch behavior on mobile */
-    body {
-      touch-action: manipulation;
-    }
-  </style>
+  <!-- Link External Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans select-none">
 
@@ -41,19 +25,16 @@
 
     <!-- TOP RIGHT CONTROLS -->
     <div class="flex items-center gap-2">
-      <!-- Teams Switch Button -->
       <button id="teamsMenuBtn" onclick="openTeamManagerModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-amber-400 font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
         <i class="fa-solid fa-users-gear text-amber-400"></i>
         <span id="activeTeamDisplayLabel">Team: Default</span>
         <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
       </button>
 
-      <!-- Team Roster & Lineup Configurator Button -->
       <button onclick="openTeamSetupModal()" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 rounded-lg text-xs font-bold transition" title="Edit Roster & Starting Lineup">
         <i class="fa-solid fa-pen-to-square text-amber-400"></i>
       </button>
 
-      <!-- Reset / New Game Button -->
       <button onclick="startNewGame()" class="p-2 bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded-lg text-xs font-bold transition" title="Start New Match">
         <i class="fa-solid fa-rotate"></i>
       </button>
@@ -96,17 +77,14 @@
     <!-- VOLLEYBALL COURT GUI (CIRCULAR NODES) -->
     <div class="relative w-full aspect-[4/3] max-h-[420px] volleyball-court rounded-xl border-4 border-slate-100 p-2 sm:p-3 flex flex-col justify-between shadow-2xl overflow-hidden">
       
-      <!-- NET INDICATOR TOP -->
       <div class="absolute top-0 left-0 right-0 h-2 bg-slate-200/90 border-b border-slate-400 flex justify-center items-center">
         <span class="text-[9px] font-black text-slate-800 tracking-widest uppercase">NET</span>
       </div>
 
-      <!-- ATTACK LINE (3-Meter Line) -->
       <div class="absolute top-1/3 left-0 right-0 h-0 attack-line border-t-2 z-0 pointer-events-none"></div>
 
       <!-- FRONT ROW POSITIONS (4, 3, 2) -->
       <div class="grid grid-cols-3 gap-2 z-10 pt-2 h-1/2 items-center justify-items-center">
-        <!-- Position 4: Front-Left -->
         <button onclick="openStatModal(4)" id="pos-4-card" class="group flex flex-col items-center focus:outline-none transition transform active:scale-95">
           <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-amber-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative" id="node-4">
             <span class="text-[9px] text-amber-400 font-black uppercase">P4</span>
@@ -114,7 +92,6 @@
           </div>
         </button>
 
-        <!-- Position 3: Front-Center -->
         <button onclick="openStatModal(3)" id="pos-3-card" class="group flex flex-col items-center focus:outline-none transition transform active:scale-95">
           <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-amber-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative" id="node-3">
             <span class="text-[9px] text-amber-400 font-black uppercase">P3</span>
@@ -122,7 +99,6 @@
           </div>
         </button>
 
-        <!-- Position 2: Front-Right -->
         <button onclick="openStatModal(2)" id="pos-2-card" class="group flex flex-col items-center focus:outline-none transition transform active:scale-95">
           <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-amber-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative" id="node-2">
             <span class="text-[9px] text-amber-400 font-black uppercase">P2</span>
@@ -133,7 +109,6 @@
 
       <!-- BACK ROW POSITIONS (5, 6, 1) -->
       <div class="grid grid-cols-3 gap-2 z-10 h-1/2 pt-2 items-center justify-items-center">
-        <!-- Position 5: Back-Left -->
         <button onclick="openStatModal(5)" id="pos-5-card" class="group flex flex-col items-center focus:outline-none transition transform active:scale-95">
           <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-slate-300 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative" id="node-5">
             <span class="text-[9px] text-slate-400 font-black uppercase">P5</span>
@@ -141,7 +116,6 @@
           </div>
         </button>
 
-        <!-- Position 6: Back-Center -->
         <button onclick="openStatModal(6)" id="pos-6-card" class="group flex flex-col items-center focus:outline-none transition transform active:scale-95">
           <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-slate-300 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative" id="node-6">
             <span class="text-[9px] text-slate-400 font-black uppercase">P6</span>
@@ -149,7 +123,6 @@
           </div>
         </button>
 
-        <!-- Position 1: Back-Right (Server) -->
         <button onclick="openStatModal(1)" id="pos-1-card" class="group flex flex-col items-center focus:outline-none transition transform active:scale-95">
           <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-emerald-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative" id="node-1">
             <span class="text-[9px] text-emerald-400 font-black uppercase">P1</span>
@@ -198,113 +171,67 @@
               <th class="py-2 px-1">Player</th>
               <th class="py-2 px-1">Kills</th>
               <th class="py-2 px-1">Errors</th>
-              <th class="py-2 px-1">Aces</th>
-              <th class="py-2 px-1">SErr</th>
+              <th class="py-2 px-1">Serve Avg</th>
+              <th class="py-2 px-1">Serve Log</th>
               <th class="py-2 px-1">Digs</th>
               <th class="py-2 px-1">Blocks</th>
               <th class="py-2 px-1">Pass Avg</th>
+              <th class="py-2 px-1">Pass Log</th>
             </tr>
           </thead>
-          <tbody id="boxScoreTbody" class="divide-y divide-slate-800/50 text-slate-200">
-            <!-- Box score rows dynamically populated via JS -->
-          </tbody>
+          <tbody id="boxScoreTbody" class="divide-y divide-slate-800/50 text-slate-200"></tbody>
         </table>
       </div>
     </div>
   </main>
 
-  <!-- ==================== MODALS ==================== -->
-
-  <!-- 1. MULTI-TEAM SELECTION MODAL -->
+  <!-- MODALS -->
   <div id="teamManagerModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-5 flex flex-col gap-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <h3 class="text-lg font-bold text-white flex items-center gap-2">
           <i class="fa-solid fa-folder-open text-amber-400"></i> Saved Teams
         </h3>
-        <button onclick="closeTeamManagerModal()" class="text-slate-400 hover:text-white text-lg">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+        <button onclick="closeTeamManagerModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
       </div>
-
-      <!-- Create New Team Input -->
       <div class="flex gap-2">
-        <input type="text" id="newTeamNameInput" placeholder="New Team Name (e.g. Varsity 2026)" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400">
-        <button onclick="createNewTeam()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-2 rounded-lg text-xs flex items-center gap-1 transition">
-          <i class="fa-solid fa-plus"></i> Create
-        </button>
+        <input type="text" id="newTeamNameInput" placeholder="New Team Name" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400">
+        <button onclick="createNewTeam()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-2 rounded-lg text-xs flex items-center gap-1 transition"><i class="fa-solid fa-plus"></i> Create</button>
       </div>
-
-      <!-- Saved Teams Container -->
       <div class="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1" id="savedTeamsContainer"></div>
-
-      <div class="border-t border-slate-800 pt-3 flex justify-between items-center">
-        <span class="text-[11px] text-slate-400">Selecting loads team roster & preset lineup.</span>
+      <div class="border-t border-slate-800 pt-3 flex justify-end">
         <button onclick="closeTeamManagerModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-bold">Done</button>
       </div>
     </div>
   </div>
 
-  <!-- 2. TEAM SETUP & LINEUP CONFIGURATOR MODAL -->
   <div id="teamSetupModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-amber-400"></i> Configure Roster & Starting Lineup
-        </h3>
-        <button onclick="closeTeamSetupModal()" class="text-slate-400 hover:text-white text-lg">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+        <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-sliders text-amber-400"></i> Configure Roster & Lineup</h3>
+        <button onclick="closeTeamSetupModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
       </div>
-
       <div class="p-4 overflow-y-auto flex flex-col gap-5 text-xs">
-        <!-- Roster Management -->
         <div>
           <div class="flex items-center justify-between mb-2">
             <span class="font-bold text-slate-200 uppercase tracking-wider">Team Roster</span>
-            <button onclick="addRosterRow()" class="px-2 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded font-bold text-[11px] flex items-center gap-1">
-              <i class="fa-solid fa-plus"></i> Add Player
-            </button>
+            <button onclick="addRosterRow()" class="px-2 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded font-bold text-[11px] flex items-center gap-1"><i class="fa-solid fa-plus"></i> Add Player</button>
           </div>
           <div id="rosterInputsList" class="flex flex-col gap-2 max-h-48 overflow-y-auto p-1 bg-slate-950/50 rounded-lg border border-slate-800"></div>
         </div>
-
-        <!-- Starting Lineup Assignment -->
         <div>
           <span class="font-bold text-slate-200 uppercase tracking-wider block mb-2">Default Starting Lineup</span>
           <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Position 1 (Server)</label>
-              <select id="lineup-select-1" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select>
-            </div>
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Position 2 (Front-Right)</label>
-              <select id="lineup-select-2" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select>
-            </div>
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Position 3 (Front-Center)</label>
-              <select id="lineup-select-3" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select>
-            </div>
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Position 4 (Front-Left)</label>
-              <select id="lineup-select-4" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select>
-            </div>
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Position 5 (Back-Left)</label>
-              <select id="lineup-select-5" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select>
-            </div>
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Position 6 (Back-Center)</label>
-              <select id="lineup-select-6" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select>
-            </div>
-            <div class="col-span-2">
-              <label class="text-[11px] text-indigo-300 block mb-1">Default Libero</label>
-              <select id="lineup-select-libero" class="w-full bg-slate-950 border border-indigo-700 rounded p-1.5 text-indigo-200 font-bold"></select>
-            </div>
+            <div><label class="text-[11px] text-slate-400 block mb-1">Position 1 (Server)</label><select id="lineup-select-1" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select></div>
+            <div><label class="text-[11px] text-slate-400 block mb-1">Position 2 (Front-Right)</label><select id="lineup-select-2" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select></div>
+            <div><label class="text-[11px] text-slate-400 block mb-1">Position 3 (Front-Center)</label><select id="lineup-select-3" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select></div>
+            <div><label class="text-[11px] text-slate-400 block mb-1">Position 4 (Front-Left)</label><select id="lineup-select-4" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select></div>
+            <div><label class="text-[11px] text-slate-400 block mb-1">Position 5 (Back-Left)</label><select id="lineup-select-5" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select></div>
+            <div><label class="text-[11px] text-slate-400 block mb-1">Position 6 (Back-Center)</label><select id="lineup-select-6" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white font-bold"></select></div>
+            <div class="col-span-2"><label class="text-[11px] text-indigo-300 block mb-1">Default Libero</label><select id="lineup-select-libero" class="w-full bg-slate-950 border border-indigo-700 rounded p-1.5 text-indigo-200 font-bold"></select></div>
           </div>
         </div>
       </div>
-
       <div class="p-3 border-t border-slate-800 flex justify-end gap-2 bg-slate-900">
         <button onclick="closeTeamSetupModal()" class="px-3 py-1.5 bg-slate-800 text-slate-300 rounded font-bold">Cancel</button>
         <button onclick="saveTeamSetup()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded font-black">Save Lineup & Roster</button>
@@ -312,22 +239,16 @@
     </div>
   </div>
 
-  <!-- 3. ACTION / STAT LOGGING MODAL -->
   <div id="statModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-4 flex flex-col gap-4 shadow-2xl">
-      
-      <!-- Modal Title -->
       <div class="flex justify-between items-center border-b border-slate-800 pb-2">
         <div>
           <span class="text-[10px] text-amber-400 font-black uppercase tracking-widest block" id="modalPosTitle">POSITION 1</span>
           <h3 class="text-lg font-black text-white" id="modalPlayerTitle">#0 Player</h3>
         </div>
-        <button onclick="closeStatModal()" class="text-slate-400 hover:text-white text-lg">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+        <button onclick="closeStatModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <!-- Tap Bench Sub Container -->
       <div class="bg-slate-950/80 border border-slate-800 rounded-lg p-2.5 flex flex-col gap-2">
         <span class="text-[11px] font-bold text-slate-300 uppercase flex items-center gap-1">
           <i class="fa-solid fa-right-left text-amber-400"></i> Tap Bench Player to Sub In:
@@ -343,12 +264,6 @@
         <button onclick="logStat('Attack', 'Error')" class="p-2.5 bg-rose-950 hover:bg-rose-900 border border-rose-700 text-rose-200 font-bold rounded-lg flex items-center justify-between">
           <span>Attack Error</span> <i class="fa-solid fa-xmark text-rose-400"></i>
         </button>
-        <button onclick="logStat('Serve', 'Ace')" class="p-2.5 bg-emerald-950 hover:bg-emerald-900 border border-emerald-700 text-emerald-200 font-bold rounded-lg flex items-center justify-between">
-          <span>Ace</span> <i class="fa-solid fa-star text-emerald-400"></i>
-        </button>
-        <button onclick="logStat('Serve', 'Error')" class="p-2.5 bg-rose-950 hover:bg-rose-900 border border-rose-700 text-rose-200 font-bold rounded-lg flex items-center justify-between">
-          <span>Serve Error</span> <i class="fa-solid fa-ban text-rose-400"></i>
-        </button>
         <button onclick="logStat('Defense', 'Dig')" class="p-2.5 bg-sky-950 hover:bg-sky-900 border border-sky-700 text-sky-200 font-bold rounded-lg flex items-center justify-between">
           <span>Dig</span> <i class="fa-solid fa-shield-cat text-sky-400"></i>
         </button>
@@ -357,552 +272,32 @@
         </button>
       </div>
 
-      <!-- Passing Rating Buttons -->
+      <!-- Serve Rating (0-4) Buttons -->
       <div class="border-t border-slate-800 pt-3">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Log Serve Receive Rating</span>
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Log Serve Rating (0 = Error, 4 = Ace)</span>
+        <div class="grid grid-cols-5 gap-1.5">
+          <button onclick="logStat('Serve', 4)" class="py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-lg text-xs">4 (Ace)</button>
+          <button onclick="logStat('Serve', 3)" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-lg text-xs">3</button>
+          <button onclick="logStat('Serve', 2)" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-lg text-xs">2</button>
+          <button onclick="logStat('Serve', 1)" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-lg text-xs">1</button>
+          <button onclick="logStat('Serve', 0)" class="py-2 bg-rose-950 hover:bg-rose-900 text-rose-200 font-bold rounded-lg text-xs">0 (Err)</button>
+        </div>
+      </div>
+
+      <!-- Passing Rating Buttons -->
+      <div class="border-t border-slate-800 pt-2">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Log Serve Receive Rating (0-3)</span>
         <div class="grid grid-cols-4 gap-2">
-          <button onclick="logStat('Pass', 3)" class="py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-lg text-sm">3 Pass</button>
-          <button onclick="logStat('Pass', 2)" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-lg text-sm">2 Pass</button>
-          <button onclick="logStat('Pass', 1)" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-lg text-sm">1 Pass</button>
-          <button onclick="logStat('Pass', 0)" class="py-2 bg-rose-950 hover:bg-rose-900 text-rose-200 font-bold rounded-lg text-sm">0 Pass</button>
+          <button onclick="logStat('Pass', 3)" class="py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-lg text-xs">3 Pass</button>
+          <button onclick="logStat('Pass', 2)" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-lg text-xs">2 Pass</button>
+          <button onclick="logStat('Pass', 1)" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-lg text-xs">1 Pass</button>
+          <button onclick="logStat('Pass', 0)" class="py-2 bg-rose-950 hover:bg-rose-900 text-rose-200 font-bold rounded-lg text-xs">0 Pass</button>
         </div>
       </div>
     </div>
   </div>
 
-
-  <!-- JavaScript Application Logic -->
-  <script>
-    // initial team data
-    const DEFAULT_TEAM_DATA = {
-      activeTeamId: "team_default",
-      teams: {
-        "team_default": {
-          id: "team_default",
-          name: "Default Team",
-          roster: [
-            { num: "4", name: "Player 1" },
-            { num: "2", name: "Player 2" },
-            { num: "5", name: "Player 3" },
-            { num: "12", name: "Player 4" },
-            { num: "8", name: "Player 5" },
-            { num: "15", name: "Player 6" },
-            { num: "1", name: "Libero" }
-          ],
-          startingLineup: { 1: "4", 2: "2", 3: "5", 4: "12", 5: "8", 6: "15", libero: "1" }
-        }
-      }
-    };
-
-    // global state
-    let appTeamsData = loadAllTeamsFromStorage();
-    let activeTeamId = appTeamsData.activeTeamId;
-    let teamRoster = appTeamsData.teams[activeTeamId].roster;
-    let defaultStartingLineup = appTeamsData.teams[activeTeamId].startingLineup;
-
-    let court = { 1: "4", 2: "2", 3: "5", 4: "12", 5: "8", 6: "15" };
-    let liberoNumber = "1";
-    let activeLiberoSubPos = null; // libero track
-    let originalPlayerBeforeLibero = null;
-
-    let matchId = Date.now().toString();
-    let statLogs = [];
-    let currentPosSelected = null;
-
-    // load team from data set
-    function loadAllTeamsFromStorage() {
-      const stored = localStorage.getItem('vb_app_teams_data');
-      if (stored) {
-        try { return JSON.parse(stored); } catch (e) { console.error(e); }
-      }
-      return DEFAULT_TEAM_DATA;
-    }
-
-    // team to browser storage
-    function saveAllTeamsToStorage() {
-      appTeamsData.activeTeamId = activeTeamId;
-      appTeamsData.teams[activeTeamId].roster = teamRoster;
-      appTeamsData.teams[activeTeamId].startingLineup = defaultStartingLineup;
-      localStorage.setItem('vb_app_teams_data', JSON.stringify(appTeamsData));
-      updateActiveTeamLabel();
-    }
-
-    // initialize active team lineup to court
-    function applyActiveTeamLineupToCourt() {
-      for (let pos = 1; pos <= 6; pos++) {
-        court[pos] = defaultStartingLineup[pos] || "1";
-      }
-      liberoNumber = defaultStartingLineup.libero || "1";
-      activeLiberoSubPos = null;
-      updateCourtGUI();
-    }
-
-    // lookup player
-    function getPlayerName(num) {
-      const match = teamRoster.find(p => p.num === num);
-      return match ? match.name : "";
-    }
-
-    // court circle gui
-    function updateCourtGUI() {
-      for (let pos = 1; pos <= 6; pos++) {
-        const circleEl = document.getElementById(`circle-${pos}`);
-        const nodeEl = document.getElementById(`node-${pos}`);
-        const playerNum = court[pos];
-        const playerName = getPlayerName(playerNum);
-        const isLibero = (playerNum === liberoNumber);
-
-        // Update border color dynamically for Libero vs Standard
-        if (nodeEl) {
-          if (isLibero) {
-            nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-indigo-950/90 border-2 border-indigo-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative";
-          } else if (pos === 1) {
-            nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-emerald-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative";
-          } else if (pos <= 4) {
-            nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-amber-400 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative";
-          } else {
-            nodeEl.className = "w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-950/85 border-2 border-slate-300 flex flex-col items-center justify-center shadow-xl group-hover:scale-105 transition relative";
-          }
-        }
-
-        circleEl.innerHTML = `
-          <span class="text-xs sm:text-sm ${isLibero ? 'text-indigo-300' : 'text-white'} font-black leading-none">#${playerNum}</span>
-          <span class="text-[8px] sm:text-[9px] text-slate-200 font-bold truncate max-w-[48px] leading-tight mt-0.5">${playerName}</span>
-        `;
-      }
-      document.getElementById('liberoStatusDisplay').innerText = `Active Libero: #${liberoNumber} (${getPlayerName(liberoNumber)})`;
-    }
-
-    // rotation
-    function rotateCourt(direction = 'cw') {
-      if (direction === 'cw') {
-        const temp1 = court[1];
-        court[1] = court[2];
-        court[2] = court[3];
-        court[3] = court[4];
-        court[4] = court[5];
-        court[5] = court[6];
-        court[6] = temp1;
-      } else {
-        const temp1 = court[1];
-        court[1] = court[6];
-        court[6] = court[5];
-        court[5] = court[4];
-        court[4] = court[3];
-        court[3] = court[2];
-        court[2] = temp1;
-      }
-      updateCourtGUI();
-      saveCurrentMatchState(false);
-    }
-
-    // quick lib sub
-    function toggleLiberoSub(posStr) {
-      const pos = parseInt(posStr);
-      if (court[pos] === liberoNumber) {
-        if (originalPlayerBeforeLibero) {
-          court[pos] = originalPlayerBeforeLibero;
-          originalPlayerBeforeLibero = null;
-        }
-        activeLiberoSubPos = null;
-      } else {
-        originalPlayerBeforeLibero = court[pos];
-        court[pos] = liberoNumber;
-        activeLiberoSubPos = pos;
-      }
-      updateCourtGUI();
-      saveCurrentMatchState(false);
-    }
-
-    // open stat modal
-    function openStatModal(pos) {
-      currentPosSelected = pos;
-      const num = court[pos];
-      const name = getPlayerName(num);
-
-      document.getElementById('modalPosTitle').innerText = `POSITION ${pos}`;
-      document.getElementById('modalPlayerTitle').innerText = `#${num} ${name}`;
-
-      renderBenchSubButtons();
-      document.getElementById('statModal').classList.remove('hidden');
-    }
-
-    function closeStatModal() {
-      document.getElementById('statModal').classList.add('hidden');
-      currentPosSelected = null;
-    }
-
-    // sub button models
-    function renderBenchSubButtons() {
-      const container = document.getElementById('benchSubContainer');
-      container.innerHTML = '';
-
-      teamRoster.forEach(p => {
-        const btn = document.createElement('button');
-        btn.className = "px-2 py-1 bg-slate-900 hover:bg-amber-500 hover:text-slate-950 border border-slate-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition";
-        btn.innerHTML = `<span class="text-amber-400">#${p.num}</span> <span>${p.name}</span>`;
-        btn.onclick = function() { applyDirectSub(p.num); };
-        container.appendChild(btn);
-      });
-    }
-
-    function applyDirectSub(newNum) {
-      if (!currentPosSelected) return;
-      court[currentPosSelected] = newNum;
-      const playerName = getPlayerName(newNum);
-      document.getElementById('modalPlayerTitle').innerText = `#${newNum} ${playerName}`;
-      updateCourtGUI();
-      saveCurrentMatchState(false);
-    }
-
-    // log action
-    function logStat(type, value) {
-      if (!currentPosSelected) return;
-
-      const playerNum = court[currentPosSelected];
-      const opponent = document.getElementById('opponentInput').value || 'Opponent';
-      const setVal = document.getElementById('setSelect').value || '1';
-
-      const entry = {
-        timestamp: new Date().toISOString(),
-        opponent: opponent,
-        set: setVal,
-        player: playerNum,
-        position: currentPosSelected,
-        type: type,
-        value: value
-      };
-
-      statLogs.push(entry);
-      saveCurrentMatchState(false);
-      updateBoxScore();
-      closeStatModal();
-    }
-
-    // update summary box
-    function updateBoxScore() {
-      const tbody = document.getElementById('boxScoreTbody');
-      tbody.innerHTML = '';
-
-      const statsMap = {};
-
-      // initialize players stats
-      teamRoster.forEach(p => {
-        statsMap[p.num] = { kills: 0, errors: 0, aces: 0, sErrors: 0, digs: 0, blocks: 0, passes: [] };
-      });
-
-      // add logged stats to data
-      statLogs.forEach(log => {
-        if (!statsMap[log.player]) {
-          statsMap[log.player] = { kills: 0, errors: 0, aces: 0, sErrors: 0, digs: 0, blocks: 0, passes: [] };
-        }
-        const s = statsMap[log.player];
-        if (log.type === 'Attack' && log.value === 'Kill') s.kills++;
-        if (log.type === 'Attack' && log.value === 'Error') s.errors++;
-        if (log.type === 'Serve' && log.value === 'Ace') s.aces++;
-        if (log.type === 'Serve' && log.value === 'Error') s.sErrors++;
-        if (log.type === 'Defense' && log.value === 'Dig') s.digs++;
-        if (log.type === 'Block') s.blocks++;
-        if (log.type === 'Pass') s.passes.push(Number(log.value));
-      });
-
-      Object.keys(statsMap).forEach(num => {
-        const s = statsMap[num];
-        const pName = getPlayerName(num);
-        const passAvg = s.passes.length > 0 ? (s.passes.reduce((a, b) => a + b, 0) / s.passes.length).toFixed(2) : '-';
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/50 transition";
-        tr.innerHTML = `
-          <td class="py-1.5 px-1 font-bold text-amber-400">#${num}</td>
-          <td class="py-1.5 px-1 font-semibold text-white">${pName}</td>
-          <td class="py-1.5 px-1">${s.kills}</td>
-          <td class="py-1.5 px-1 text-rose-400">${s.errors}</td>
-          <td class="py-1.5 px-1 text-emerald-400">${s.aces}</td>
-          <td class="py-1.5 px-1 text-rose-400">${s.sErrors}</td>
-          <td class="py-1.5 px-1">${s.digs}</td>
-          <td class="py-1.5 px-1">${s.blocks}</td>
-          <td class="py-1.5 px-1 font-bold text-amber-300">${passAvg}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // team manager settings
-    function openTeamManagerModal() {
-      renderTeamsList();
-      document.getElementById('teamManagerModal').classList.remove('hidden');
-    }
-
-    function closeTeamManagerModal() {
-      document.getElementById('teamManagerModal').classList.add('hidden');
-    }
-
-    function renderTeamsList() {
-      const container = document.getElementById('savedTeamsContainer');
-      container.innerHTML = '';
-
-      Object.values(appTeamsData.teams).forEach(team => {
-        const isActive = team.id === activeTeamId;
-        const card = document.createElement('div');
-        card.className = `flex items-center justify-between p-3 rounded-lg border transition ${
-          isActive ? 'bg-amber-500/10 border-amber-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
-        }`;
-
-        card.innerHTML = `
-          <div class="flex items-center gap-2.5">
-            <i class="fa-solid ${isActive ? 'fa-circle-check text-amber-400' : 'fa-circle text-slate-600'} text-sm"></i>
-            <div>
-              <div class="font-bold text-sm ${isActive ? 'text-amber-400' : 'text-white'}">${team.name}</div>
-              <div class="text-[11px] text-slate-400">${team.roster.length} Players Registered</div>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            ${!isActive ? `<button onclick="switchActiveTeam('${team.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 rounded text-xs font-bold">Select</button>` : '<span class="text-xs font-black text-amber-400 uppercase tracking-wider px-2">Active</span>'}
-            ${Object.keys(appTeamsData.teams).length > 1 ? `<button onclick="deleteTeam('${team.id}')" class="p-1.5 text-slate-500 hover:text-red-400 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function createNewTeam() {
-      const nameInput = document.getElementById('newTeamNameInput');
-      const teamName = nameInput.value.trim();
-
-      if (!teamName) {
-        alert("Please enter a valid team name.");
-        return;
-      }
-
-      const newId = 'team_' + Date.now();
-      appTeamsData.teams[newId] = {
-        id: newId,
-        name: teamName,
-        roster: [
-          { num: "1", name: "Player 1" },
-          { num: "2", name: "Player 2" },
-          { num: "3", name: "Player 3" },
-          { num: "4", name: "Player 4" },
-          { num: "5", name: "Player 5" },
-          { num: "6", name: "Player 6" },
-          { num: "7", name: "Libero" }
-        ],
-        startingLineup: { 1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", libero: "7" }
-      };
-
-      nameInput.value = '';
-      switchActiveTeam(newId);
-    }
-
-    function switchActiveTeam(teamId) {
-      if (!appTeamsData.teams[teamId]) return;
-
-      activeTeamId = teamId;
-      teamRoster = appTeamsData.teams[teamId].roster;
-      defaultStartingLineup = appTeamsData.teams[teamId].startingLineup;
-
-      saveAllTeamsToStorage();
-      applyActiveTeamLineupToCourt();
-      renderTeamsList();
-      updateBoxScore();
-    }
-
-    function deleteTeam(teamId) {
-      if (Object.keys(appTeamsData.teams).length <= 1) {
-        alert("You must keep at least one team.");
-        return;
-      }
-
-      const teamName = appTeamsData.teams[teamId].name;
-      if (!confirm(`Are you sure you want to delete "${teamName}"?`)) return;
-
-      delete appTeamsData.teams[teamId];
-
-      if (activeTeamId === teamId) {
-        activeTeamId = Object.keys(appTeamsData.teams)[0];
-        teamRoster = appTeamsData.teams[activeTeamId].roster;
-        defaultStartingLineup = appTeamsData.teams[activeTeamId].startingLineup;
-      }
-
-      saveAllTeamsToStorage();
-      applyActiveTeamLineupToCourt();
-      renderTeamsList();
-      updateBoxScore();
-    }
-
-    function updateActiveTeamLabel() {
-      const currentTeam = appTeamsData.teams[activeTeamId];
-      const label = document.getElementById('activeTeamDisplayLabel');
-      if (label && currentTeam) {
-        label.innerText = `Team: ${currentTeam.name}`;
-      }
-    }
-
-    // team setup
-    function openTeamSetupModal() {
-      renderRosterEditorInputs();
-      populateLineupSelectDropdowns();
-      document.getElementById('teamSetupModal').classList.remove('hidden');
-    }
-
-    function closeTeamSetupModal() {
-      document.getElementById('teamSetupModal').classList.add('hidden');
-    }
-
-    function renderRosterEditorInputs() {
-      const container = document.getElementById('rosterInputsList');
-      container.innerHTML = '';
-
-      teamRoster.forEach((p, idx) => {
-        const row = document.createElement('div');
-        row.className = "flex items-center gap-2";
-        row.innerHTML = `
-          <input type="text" placeholder="#" value="${p.num}" class="roster-num-input w-16 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-amber-400 font-bold focus:outline-none">
-          <input type="text" placeholder="Player Name" value="${p.name}" class="roster-name-input flex-1 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white font-bold focus:outline-none">
-          <button onclick="removeRosterRow(${idx})" class="p-1 text-slate-500 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can"></i></button>
-        `;
-        container.appendChild(row);
-      });
-    }
-
-    function addRosterRow() {
-      teamRoster.push({ num: "", name: "" });
-      renderRosterEditorInputs();
-    }
-
-    function removeRosterRow(idx) {
-      teamRoster.splice(idx, 1);
-      renderRosterEditorInputs();
-      populateLineupSelectDropdowns();
-    }
-
-    function populateLineupSelectDropdowns() {
-      const numInputs = document.querySelectorAll('.roster-num-input');
-      const nameInputs = document.querySelectorAll('.roster-name-input');
-      const tempRoster = [];
-
-      numInputs.forEach((numEl, i) => {
-        if (numEl.value.trim() !== '') {
-          tempRoster.push({ num: numEl.value.trim(), name: nameInputs[i].value.trim() });
-        }
-      });
-
-      const positions = [1, 2, 3, 4, 5, 6, 'libero'];
-
-      positions.forEach(pos => {
-        const select = document.getElementById(`lineup-select-${pos}`);
-        select.innerHTML = '';
-
-        tempRoster.forEach(p => {
-          const opt = document.createElement('option');
-          opt.value = p.num;
-          opt.innerText = `#${p.num} ${p.name}`;
-          if (defaultStartingLineup[pos] === p.num) opt.selected = true;
-          select.appendChild(opt);
-        });
-      });
-    }
-
-    function saveTeamSetup() {
-      const numInputs = document.querySelectorAll('.roster-num-input');
-      const nameInputs = document.querySelectorAll('.roster-name-input');
-      const updatedRoster = [];
-
-      numInputs.forEach((numEl, i) => {
-        const num = numEl.value.trim();
-        const name = nameInputs[i].value.trim();
-        if (num !== '') {
-          updatedRoster.push({ num, name });
-        }
-      });
-
-      teamRoster = updatedRoster;
-
-      const positions = [1, 2, 3, 4, 5, 6, 'libero'];
-      positions.forEach(pos => {
-        const select = document.getElementById(`lineup-select-${pos}`);
-        if (select && select.value) {
-          defaultStartingLineup[pos] = select.value;
-        }
-      });
-
-      saveAllTeamsToStorage();
-      applyActiveTeamLineupToCourt();
-      updateBoxScore();
-      closeTeamSetupModal();
-    }
-
-    // match persistence
-    function saveCurrentMatchState(isUIOnly = false) {
-      const state = {
-        court,
-        liberoNumber,
-        matchId,
-        statLogs,
-        opponent: document.getElementById('opponentInput').value,
-        set: document.getElementById('setSelect').value
-      };
-      localStorage.setItem('vb_live_match_state', JSON.stringify(state));
-    }
-
-    function loadSavedMatchState() {
-      const saved = localStorage.getItem('vb_live_match_state');
-      if (saved) {
-        try {
-          const state = JSON.parse(saved);
-          if (state.court) court = state.court;
-          if (state.liberoNumber) liberoNumber = state.liberoNumber;
-          if (state.matchId) matchId = state.matchId;
-          if (state.statLogs) statLogs = state.statLogs;
-          if (state.opponent) document.getElementById('opponentInput').value = state.opponent;
-          if (state.set) document.getElementById('setSelect').value = state.set;
-        } catch (e) { console.error(e); }
-      }
-    }
-
-    function startNewGame() {
-      if (!confirm("Start a new game? This will reset the live court to your active team's starting lineup.")) return;
-      matchId = Date.now().toString();
-      statLogs = [];
-      applyActiveTeamLineupToCourt();
-      saveCurrentMatchState(false);
-      updateBoxScore();
-    }
-
-    function exportCSV() {
-      if (statLogs.length === 0) {
-        alert("No logged stats to export yet.");
-        return;
-      }
-
-      let csvContent = "data:text/csv;charset=utf-8,Timestamp,Opponent,Set,PlayerNum,PlayerName,CourtPosition,StatType,RatingValue\n";
-      
-      statLogs.forEach(row => {
-        const pName = getPlayerName(row.player);
-        csvContent += `${row.timestamp},${row.opponent},${row.set},${row.player},"${pName}",${row.position},${row.type},${row.value}\n`;
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `vb_stats_${document.getElementById('opponentInput').value}_Set${document.getElementById('setSelect').value}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    // initialize app
-    document.addEventListener('DOMContentLoaded', () => {
-      updateActiveTeamLabel();
-      loadSavedMatchState();
-      updateCourtGUI();
-      updateBoxScore();
-    });
-  </script>
+  <!-- Link External JavaScript Application Script -->
+  <script src="app.js"></script>
 </body>
 </html>
-
-## git add .
-## git commit -m "Update court layout and logic"
-## git push
