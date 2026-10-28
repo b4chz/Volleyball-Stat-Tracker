@@ -92,12 +92,16 @@ function updateCourtGUI() {
     }
 
     if (circleEl) {
+      // Tag this inner content with the player's specific number so we can track their token
       circleEl.innerHTML = `
-        <span class="text-xs sm:text-sm ${isLibero ? 'text-indigo-300' : 'text-white'} font-black leading-none">#${playerNum}</span>
-        <span class="text-[8px] sm:text-[9px] text-slate-200 font-bold truncate max-w-[48px] leading-tight mt-0.5">${playerName}</span>
+        <div data-player-token="${playerNum}" class="w-full h-full flex flex-col items-center justify-center">
+          <span class="text-xs sm:text-sm ${isLibero ? 'text-indigo-300' : 'text-white'} font-black leading-none">#${playerNum}</span>
+          <span class="text-[8px] sm:text-[9px] text-slate-200 font-bold truncate max-w-[48px] leading-tight mt-0.5">${playerName}</span>
+        </div>
       `;
     }
   }
+
   const liberoDisplay = document.getElementById('liberoStatusDisplay');
   if (liberoDisplay) {
     liberoDisplay.innerText = `Active Libero: #${liberoNumber} (${getPlayerName(liberoNumber)})`;
@@ -107,17 +111,15 @@ function updateCourtGUI() {
 // rotation handler
 function rotateCourt(direction = 'cw') {
   try {
-    // 1. Capture screen positions and HTML content of every player before moving
-    const playerRects = {};
-    const playerHtml = {};
-    for (let pos = 1; pos <= 6; pos++) {
-      const playerNum = court[pos];
-      const el = document.getElementById(`circle-${pos}`);
-      if (el && playerNum) {
-        playerRects[playerNum] = el.getBoundingClientRect();
-        playerHtml[playerNum] = el.innerHTML;
+    // 1. FIRST: Snapshot the exact screen coordinates of every player's token before rotating
+    const oldRects = {};
+    const tokens = document.querySelectorAll('[data-player-token]');
+    tokens.forEach(token => {
+      const playerId = token.getAttribute('data-player-token');
+      if (playerId) {
+        oldRects[playerId] = token.getBoundingClientRect();
       }
-    }
+    });
 
     // 2. Perform rotation data logic
     if (direction === 'cw') {
@@ -138,59 +140,36 @@ function rotateCourt(direction = 'cw') {
       court[2] = temp1;
     }
 
-    // 3. Update the underlying court GUI normally
+    // 3. LAST: Re-render the court GUI with the new positions
     updateCourtGUI();
 
-    // 4. Create flying clones that physically glide from old zone to new zone
-    const activeClones = [];
-    for (let pos = 1; pos <= 6; pos++) {
-      const playerNum = court[pos];
-      const targetEl = document.getElementById(`circle-${pos}`);
-      const oldRect = playerRects[playerNum];
-      const htmlContent = playerHtml[playerNum];
+    // 4. INVERT & PLAY: Animate each player's token sliding from its old position to its new position
+    const newTokens = document.querySelectorAll('[data-player-token]');
+    newTokens.forEach(newToken => {
+      const playerId = newToken.getAttribute('data-player-token');
+      const oldRect = oldRects[playerId];
 
-      if (targetEl && oldRect && htmlContent) {
-        // Temporarily hide the destination circle so the flying clone takes center stage
-        targetEl.style.opacity = '0';
-        const newRect = targetEl.getBoundingClientRect();
+      if (playerId && oldRect) {
+        const newRect = newToken.getBoundingClientRect();
+        const dx = oldRect.left - newRect.left;
+        const dy = oldRect.top - newRect.top;
 
-        // Spawn a floating clone at the old player's screen position
-        const clone = document.createElement('div');
-        clone.className = targetEl.className + ' fixed z-50 pointer-events-none shadow-2xl';
-        clone.style.width = `${oldRect.width}px`;
-        clone.style.height = `${oldRect.height}px`;
-        clone.style.left = `${oldRect.left}px`;
-        clone.style.top = `${oldRect.top}px`;
-        clone.style.transition = 'all 0.45s cubic-bezier(0.16, 1, 0.3, 1)';
-        clone.innerHTML = htmlContent;
-        document.body.appendChild(clone);
+        if (dx !== 0 || dy !== 0) {
+          // Invert: snap instantly to the old screen position without transition
+          newToken.style.transform = `translate(${dx}px, ${dy}px)`;
+          newToken.style.transition = 'none';
 
-        // Force browser reflow
-        void clone.offsetWidth;
+          // Force browser reflow
+          void newToken.offsetWidth;
 
-        // Glide the clone across the screen to the new zone position
-        clone.style.left = `${newRect.left}px`;
-        clone.style.top = `${newRect.top}px`;
-
-        activeClones.push({ clone, targetEl });
+          // Play: smoothly glide to the new zone position (0,0)
+          newToken.style.transition = 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)';
+          newToken.style.transform = 'translate(0px, 0px)';
+        }
       }
-    }
-
-    // 5. Clean up clones and reveal the stationary court circles once flight completes
-    setTimeout(() => {
-      activeClones.forEach(({ clone, targetEl }) => {
-        if (clone && clone.parentNode) {
-          clone.parentNode.removeChild(clone);
-        }
-        if (targetEl) {
-          targetEl.style.opacity = '1';
-        }
-      });
-    }, 460);
-
+    });
   } catch (err) {
-    console.error("Error during rotation animation:", err);
-    updateCourtGUI();
+    console.error("Error during token rotation animation:", err);
   }
 
   saveCurrentMatchState(false);
