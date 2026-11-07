@@ -439,6 +439,7 @@ function updateActiveTeamLabel() {
 function openTeamSetupModal() {
   renderRosterEditorInputs();
   populateLineupSelectDropdowns();
+  populateLiberoDropdowns();
   const modal = document.getElementById('teamSetupModal');
   if (modal) modal.classList.remove('hidden');
 }
@@ -598,26 +599,44 @@ function populateLiberoDropdowns() {
   const l2Select = document.getElementById('libero2Select');
   if (!l1Select || !l2Select) return;
 
+  // Save current selections so they don't get wiped out if re-rendered
+  const currentL1 = l1Select.value || liberoNumbers[0];
+  const currentL2 = l2Select.value || liberoNumbers[1];
+
   l1Select.innerHTML = '<option value="">Select Libero 1</option>';
   l2Select.innerHTML = '<option value="">Select Libero 2</option>';
 
-  if (teamRoster && typeof teamRoster === 'object') {
-    Object.entries(teamRoster).forEach(([num, name]) => {
-      const opt1 = document.createElement('option');
-      opt1.value = num;
-      opt1.textContent = `#${num} - ${name}`;
-      l1Select.appendChild(opt1);
+  // Grab all currently typed players from the active roster editor inputs (or fallback to teamRoster)
+  const numInputs = document.querySelectorAll('.roster-num-input');
+  const nameInputs = document.querySelectorAll('.roster-name-input');
+  const activeRosterList = [];
 
-      const opt2 = document.createElement('option');
-      opt2.value = num;
-      opt2.textContent = `#${num} - ${name}`;
-      l2Select.appendChild(opt2);
+  if (numInputs.length > 0) {
+    numInputs.forEach((numEl, i) => {
+      const num = numEl.value.trim();
+      const name = nameInputs[i] ? nameInputs[i].value.trim() : '';
+      if (num !== '') activeRosterList.push({ num, name });
     });
+  } else if (teamRoster && Array.isArray(teamRoster)) {
+    teamRoster.forEach(p => activeRosterList.push(p));
   }
 
-  // Restore saved selections if any
-  if (liberoNumbers[0]) l1Select.value = liberoNumbers[0];
-  if (liberoNumbers[1]) l2Select.value = liberoNumbers[1];
+  // Populate both dropdowns with every rostered player
+  activeRosterList.forEach(p => {
+    const opt1 = document.createElement('option');
+    opt1.value = p.num;
+    opt1.textContent = `#${p.num} - ${p.name}`;
+    l1Select.appendChild(opt1);
+
+    const opt2 = document.createElement('option');
+    opt2.value = p.num;
+    opt2.textContent = `#${p.num} - ${p.name}`;
+    l2Select.appendChild(opt2);
+  });
+
+  // Restore selections
+  if (currentL1) l1Select.value = currentL1;
+  if (currentL2) l2Select.value = currentL2;
 }
 
 // Set Libero 1 or Libero 2 from settings dropdowns
