@@ -467,7 +467,22 @@ function renderRosterEditorInputs() {
 
 
 function addRosterRow() {
-  teamRoster.push({ num: "", name: "" });
+  // Capture current values from existing inputs before adding a new row
+  const numInputs = document.querySelectorAll('.roster-num-input');
+  const nameInputs = document.querySelectorAll('.roster-name-input');
+  const preservedRoster = [];
+
+  numInputs.forEach((numEl, i) => {
+    preservedRoster.push({
+      num: numEl.value.trim(),
+      name: nameInputs[i] ? nameInputs[i].value.trim() : ''
+    });
+  });
+
+  // Push a new blank row and update the dataset
+  preservedRoster.push({ num: "", name: "" });
+  teamRoster = preservedRoster;
+
   renderRosterEditorInputs();
 }
 
@@ -488,6 +503,7 @@ function populateLineupSelectDropdowns() {
     }
   });
 
+  // Uncap positions 1 through 6 to allow selecting any rostered player
   const positions = [1, 2, 3, 4, 5, 6, 'libero'];
 
   positions.forEach(pos => {
